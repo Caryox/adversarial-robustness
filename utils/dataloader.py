@@ -13,7 +13,7 @@ import torchvision.transforms as transforms
 # CustomPackages
 import param
 
-"""Function Create Dataloader"""
+
 def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False):
     
     lengths = [round(len(dataset) * split) for split in split_aufteilung] # calculate lengths per dataset without consideration Split_Aufteilung
