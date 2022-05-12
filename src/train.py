@@ -5,10 +5,16 @@ import param, dataloader
 
 import basic_classification_nn
 
+import torch
+from torch import optim
+import torch.nn as nn
+import torch.nn.functional as F
+
+
 
 
 #https://medium.com/@nutanbhogendrasharma/pytorch-convolutional-neural-network-with-mnist-dataset-4e8a4265e118
-from torch.autograd import Variable
+#from torch.autograd import Variable
 
 
 
@@ -17,26 +23,24 @@ def train(num_epochs, Net, loaders):
     Net.train()
         
     # Train the model
-    total_step = len(loaders[0])
-        
+    total_step = len(loaders)
+    optimizer = optim.SGD(Net.parameters(), lr = param.learning_rate, momentum=param.momentum)   
+    
     for epoch in range(num_epochs):
         running_loss = 0.0
-        for i, data in enumerate(loaders[0],0):                                                            #, (images, labels) in enumerate(loaders['train']):
+        for i, data in enumerate(loaders,0):
             
             inputs, labels = data
-            # gives batch data, normalize x when iterate train_loader
-            #b_x = Variable(images)   # batch x
-            #b_y = Variable(labels)   # batch y
-
+            
             # clear gradients for this training step   
             optimizer.zero_grad() 
 
-
-            output = Net(inputs)                   #(b_x)[0]               
-            loss = loss_func(output, labels)                  
+            output = Net(inputs)            
+            loss = nn.CrossEntropyLoss(output, labels)                  
             
             # backpropagation, compute gradients 
-            loss.backward()    
+            loss.backward()
+            
             # apply gradients             
             optimizer.step()          
             
@@ -56,5 +60,5 @@ def train(num_epochs, Net, loaders):
     
     print("Training abgeschlossen")
     
-train(param.num_epochs, basic_classification_nn, dataloader.dataloader_MNIST[0])
+train(param.num_epochs, basic_classification_nn.basic_Net, dataloader.train_dataloader)
 

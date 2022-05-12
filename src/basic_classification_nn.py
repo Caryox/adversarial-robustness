@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -22,3 +23,4 @@ class Net(nn.Module):
         return x
 
 basic_Net = Net()
+print (basic_Net)

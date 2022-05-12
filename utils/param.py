@@ -7,8 +7,8 @@
 num_epochs = 20
 BATCH_SIZE = 64
 IMAGE_SIZE = 32
-#learning_rate = 0.01
-#momentum = 0.5
+learning_rate = 0.01
+momentum = 0.5
 NORM = (0.5,), (0.5,)
 count = 0
 loss_list = []

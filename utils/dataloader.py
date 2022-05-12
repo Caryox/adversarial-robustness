@@ -13,7 +13,6 @@ import torchvision.transforms as transforms
 # CustomPackages
 import param
 
-
 def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False):
     
     lengths = [round(len(dataset) * split) for split in split_aufteilung] # calculate lengths per dataset without consideration Split_Aufteilung
@@ -103,7 +102,7 @@ test_dataset_MNIST = datasets.MNIST(root='./data', train=False, download=True,
 dataset_MNIST = ConcatDataset([train_dataset_MNIST, test_dataset_MNIST])
 
 #Custom Train, Validation, Test Split
-dataloader_MNIST= dataloader(dataset_MNIST, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG)
+train_dataloader, validation_dataloader, test_dataloader = dataloader(dataset_MNIST, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG)
 
 
 '''-----Erweiterung-----'''
