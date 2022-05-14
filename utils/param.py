@@ -16,7 +16,6 @@ iteration_list = []
 accuracy_list = []
 train_counter = []
 num_of_worker = 1
-log_interval = 10
 random_seed = 1337
 
 

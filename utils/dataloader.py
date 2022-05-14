@@ -39,7 +39,7 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         shuffle=False,
         drop_last=True,
         worker_init_fn=random_seed,
-        num_workers=0,
+        num_workers=0, #num_Worker = 0 because MemoryError 
         #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
