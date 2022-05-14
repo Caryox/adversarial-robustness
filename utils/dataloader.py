@@ -13,7 +13,9 @@ import torchvision.transforms as transforms
 # CustomPackages
 import param
 
-def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False):
+def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False, num_of_worker=param.num_of_worker, random_seed=1337):
+    torch.backends.cudnn.enabled = True
+    torch.manual_seed(random_seed)
     
     lengths = [round(len(dataset) * split) for split in split_aufteilung] # calculate lengths per dataset without consideration Split_Aufteilung
 
@@ -35,8 +37,10 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         train,
         batch_size=BATCH_SIZE,
         shuffle=False,
-        num_workers=1,
-        prefetch_factor=1,
+        drop_last=True,
+        worker_init_fn=random_seed,
+        num_workers=0,
+        #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
     )
@@ -45,8 +49,10 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         validation,
         batch_size=BATCH_SIZE,
         shuffle=False,
-        num_workers=4,
-        prefetch_factor=2,
+        drop_last=True,
+        worker_init_fn=random_seed,
+        num_workers=num_of_worker,
+        #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
     )
@@ -55,8 +61,10 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         test,
         batch_size=BATCH_SIZE,
         shuffle=False,
-        num_workers=4,
-        prefetch_factor=2,
+        drop_last=True,
+        worker_init_fn=random_seed,
+        num_workers=num_of_worker,
+        #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
     )
@@ -102,7 +110,7 @@ test_dataset_MNIST = datasets.MNIST(root='./data', train=False, download=True,
 dataset_MNIST = ConcatDataset([train_dataset_MNIST, test_dataset_MNIST])
 
 #Custom Train, Validation, Test Split
-train_dataloader, validation_dataloader, test_dataloader = dataloader(dataset_MNIST, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG)
+train_dataloader, validation_dataloader, test_dataloader = dataloader(dataset_MNIST, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG, param.num_of_worker)
 
 
 '''-----Erweiterung-----'''
