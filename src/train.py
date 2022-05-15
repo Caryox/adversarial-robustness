@@ -3,7 +3,7 @@ import sys
 sys.path.append('./utils')
 import dataloader
 import param
-
+from functions import basic_nn as basic
 # Standard Packages
 
 from torch.autograd import Variable
@@ -14,7 +14,7 @@ import torch.nn as nn
 import torchvision
 from torch import optim
 import torch
-from functions import basic_nn as basic
+
 
 # https://medium.com/@nutanbhogendrasharma/pytorch-convolutional-neural-network-with-mnist-dataset-4e8a4265e118
 
@@ -48,9 +48,12 @@ def train(num_epochs, basic, BATCH_SIZE):
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.3f}'.format(epoch +
                       1, num_epochs, i + 1, total_step, running_loss))
 
-                running_loss = 0.0
+            running_loss = 0.0
 
     print("Training abgeschlossen")
+    #Speichern des Models
+    Path = '.mnis_net.pth'
+    torch.save(basic.state_dict(), Path)
 
 
-train(param.num_epochs, basic.basic_Net, param.BATCH_SIZE)
+#train(param.num_epochs, basic.basic_Net, param.BATCH_SIZE)
