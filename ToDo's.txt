@@ -1,0 +1,4 @@
+1.)Dateien aus dem Verzeichnis stagen:git add . 
+2.)Checken ob es Veränderungen gibt (lokal und github):git status
+3.)Commit kommentieren:git commit -m "NACHRICHT"
+4.)Pushen (  ):git push
