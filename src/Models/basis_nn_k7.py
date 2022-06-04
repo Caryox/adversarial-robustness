@@ -4,7 +4,7 @@ import torch.nn as nn
 
 class basis_nn_k7(nn.Module):
 	def __init__(self, numChannels, classes):
-		super(basis_nn_k3, self).__init__()
+		super(basis_nn_k7, self).__init__()
 
 		self.conv1 = nn.Conv2d(in_channels=numChannels, out_channels=20,
 			kernel_size=(7, 7))
