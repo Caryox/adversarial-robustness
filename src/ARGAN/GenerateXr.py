@@ -24,9 +24,11 @@ dataset = datasets.MNIST('./data', train=True, download=True,
                              transforms.CenterCrop(param.IMAGE_SIZE),
                              transforms.ToTensor(),
                              transforms.Normalize(*param.NORM),
-                             RandomNoiseXr.AddGaussianNoise(0., 1.)]
+                             RandomNoiseXr.AddGaussianNoise(0., 1.)
+                             ]
                             )
                          )
+
 
 loader = DataLoader(
     dataset,

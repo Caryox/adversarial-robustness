@@ -1,6 +1,8 @@
 """Class to add/reverse gaussian noise to/
 from images to generate Xr for ARGAN"""
 import torch
+import param
+torch.manual_seed(param.random_seed)
 # https://discuss.pytorch.org/t/how-to-add-noise-to-mnist-dataset-when-using-pytorch/59745
 
 
@@ -17,7 +19,7 @@ class AddGaussianNoise(object):
             self.mean, self.std
             )
 
-# Not tested
+# Does not work
 
 
 class ReverseGaussianNoise(object):
@@ -26,4 +28,4 @@ class ReverseGaussianNoise(object):
         self.mean = mean
 
     def __call__(self, tensor):
-        return tensor - torch.randn(tensor.size()) / self.std - self.mean
+        return tensor - torch.randn(tensor.size()) * self.std + self.mean
