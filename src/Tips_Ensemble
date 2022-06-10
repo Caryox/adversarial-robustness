@@ -62,3 +62,8 @@ optimizer_ensemble.zero_grad()
     # How to print it
     loss_for_print = (loss1 + loss2 + loss3)/3 #Get mean loss from ensemble for printing it
     
+    
+    
+Useful links:
+https://discuss.pytorch.org/t/optimizing-based-on-another-models-output/6935/14
+https://discuss.pytorch.org/t/using-a-combined-loss-to-update-two-different-models/73925
