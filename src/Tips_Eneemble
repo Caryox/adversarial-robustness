@@ -1,0 +1,64 @@
+### Example how to use prediction average to nullify pertubations:
+
+      output = network(data)
+      output2 = network2(data)
+      output3 = network3(data)
+      output = (output + output2 + output3)/3 # Average of three network outputs.
+      pred = output.data.max(1, keepdim=True)[1]
+      
+Every output comes from a different CNN (with different Kernel Sizes, Strides, Neurons...). Since we directly get our output from our FC-Layer with 10 Output Neurons (0-9),
+each float number in the array from the output reflects the probability for the corresponding number. 
+Example: Real number is 7, so the output will look like
+
+Output
+0   1   2   3   4   5   6   7    8  9 (Index positions from the output)
+0   0   0   0   0   0   0   0.95 0  0 (Probability that the Number is 7 is 99% for output)
+
+Output 2
+0.01 0  0   0   0.2 0   0   0.85 0  0
+
+Output 3
+
+0   0   0   0   0   0   0   0.99  0 0
+
+We now have our 3 outputs with its probabilities. We now have to calculate the Mean from each output to cancel out false predictions for single models. As example for Nr 7
+pred= (0.95+0.85+0.99)/3=93%
+The pred=*** value takes the max argument from the array...and that's our arg at position 7 which will indicate that our image represents the 7
+
+In our test we then could use majority voting (I think it's better to use majority vote when the models are already trained and we want predict pertubated images)
+### Example how to use majority vote
+      array_of_votes = []
+      output = network(data)
+      output2 = network2(data)
+      output3 = network3(data)
+      array_of_votes.append(output.data.max(1, keepdim=True)[1]) # Will be 7  
+      array_of_votes.append(output2.data.max(1, keepdim=True)[1]) # Will be 7
+      array_of_votes.append(output3.data.max(1, keepdim=True)[1]) # Will be 7
+      pred = argmax(array_of_vots) # Output = the number that is most frequently represented inside array. If we would have a model which gives for example the number 6 as prediction, we still would have 6,7,7 as outputs and 7 would be the most frequent number and hence correct.
+
+      
+      
+      
+      
+Here one complete example (maybe you could check if it's ok to backpropagate each loss individual? Or have we backpropagate the aggreagated loss to each model?) 
+optimizer_ensemble = optim.SGD(list(network.parameters())+list(network2.parameters())+list(network3.parameters()), lr=learning_rate, momentum=momentum) # Put all optimizers together to simply backpropagate all models in one step
+
+optimizer_ensemble.zero_grad()
+    output1 = network(data)
+    output2 = network2(data)
+    output3 = network3(data)
+    output = (output1 + output2 + output3)/3 # Average of three networks
+    pred = output.data.max(1, keepdim=True)[1] # Our ensemble output
+    
+    # Calculate the loss for each model individual
+    loss1 = F.cross_entropy(output1, target)
+    loss2 = F.cross_entropy(output2, target)
+    loss3 = F.cross_entropy(output3, target)
+    loss = loss1+loss2+loss3
+    # Give back individual losses in correlation to the prediction
+    loss.backward()
+    optimizer_ensemble.step()
+    
+    # How to print it
+    loss_for_print = (loss1 + loss2 + loss3)/3 #Get mean loss from ensemble for printing it
+    
