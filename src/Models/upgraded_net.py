@@ -1,18 +1,16 @@
 import torch
 import torch.nn as nn
-#import torch.nn.functional as F
-
-class basis_nn_k3(nn.Module):
+class simple_net_upgraded(nn.Module): # This is the same as the previous one, but with a different (and more easy to understand) architecture. It has a few more neurons in each layer, replaced x.view(-1, 320) with linear layer. Replaced functional dropout with nn.dropout.
 	def __init__(self, numChannels, classes):
-		super(basis_nn_k3, self).__init__()
+		super(simple_net_upgraded, self).__init__()
 
 		self.conv1 = nn.Conv2d(in_channels=numChannels, out_channels=20,
-			kernel_size=(3, 3))
+			kernel_size=(5, 5))
 		self.relu1 = nn.ReLU()
 		self.maxpool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
 
 		self.conv2 = nn.Conv2d(in_channels=20, out_channels=50,
-			kernel_size=(3, 3))
+			kernel_size=(5, 5))
 		self.relu2 = nn.ReLU()
 		self.maxpool2 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
 
@@ -39,4 +37,3 @@ class basis_nn_k3(nn.Module):
 		x = self.dropout_l(x)
 		x = self.fc2(x)
 		return x
-basic_Net_k3 = basis_nn_k3()

@@ -1,0 +1,9 @@
+# Future request: calculate sum_px by muliplying img.shape values
+def count_perturbated_pixel(img1,img2):
+  sum_px = 28*28
+  sum_px_perturbed = 0
+  for px_img1,px_img2 in zip(img1[0][0],img2[0][0]): #Zip Array of Pixels
+    for px_im1,px_im2 in zip(px_img1,px_img2): #Zip Pixels
+        if (px_im1 != px_im2):
+            sum_px_perturbed+=1
+  return((sum_px_perturbed/sum_px),sum_px,sum_px_perturbed)
