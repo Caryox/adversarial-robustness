@@ -27,7 +27,7 @@ from torch.utils.data import TensorDataset
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-'''
+
 def show_images(e, x, x_adv, x_fake, save_dir):
     fig, axes = plt.subplots(3, 5, figsize=(10, 6))
     for i in range(5):
@@ -45,7 +45,6 @@ def show_images(e, x, x_adv, x_fake, save_dir):
         axes[2, i].set_title("APE-GAN")
     plt.axis("off")
     plt.savefig(os.path.join(save_dir, "result_{}.png".format(e)))
-'''
 
 def main():
     lr = 0.0002
@@ -58,7 +57,7 @@ def main():
     os.makedirs(check_path, exist_ok=True)
 
     train_data = torch.load("./src/APE-GAN/data.tar")
-    #x_tmp = train_data["normal"][:5]
+    x_tmp = train_data["normal"][:5]
     input_adv_tmp = train_data["adv"][:5]
 
     train_data = TensorDataset(train_data["normal"], train_data["adv"])
@@ -79,7 +78,7 @@ def main():
     for epoch in range(num_epochs):
         G.eval()
         input_fake = G(Variable(input_adv_tmp.to(device))).data
-        #show_images(e, x_tmp, x_adv_tmp, x_fake, check_path)
+        show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
         G.train()
         gen_loss, dis_loss, n = 0, 0, 0
         for i, data in enumerate(train_loader,0):
@@ -118,8 +117,7 @@ def main():
 
     G.eval()
     input_fake = G(Variable(input_adv_tmp.to(device))).data
-    #show_images(epochs, x_tmp, x_adv_tmp, x_fake, check_path)
+    show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
     G.train()
-
 
 main()
