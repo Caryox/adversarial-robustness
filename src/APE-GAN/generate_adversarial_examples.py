@@ -81,8 +81,11 @@ def gen_adv(model, trainloader, testloader, device):
     for i, data in enumerate(trainloader,0):
         input, label = data
         input, label = Variable(input.to(device)), Variable(label.to(device))
+        pred = model(input)
         #accuarcy
         pred = pred.data.max(1, keepdim=True)[1]
+        print(pred)
+        
         acc = pred.eq(label.data.view_as(pred)).cpu().sum()
         train_acc += acc
         
