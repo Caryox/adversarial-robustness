@@ -7,8 +7,7 @@ sys.path.append('./src/functions')
                 
 import dataloader
 import device
-
-import attacks
+import foolbox
 import basic_nn
 
 import torch
@@ -78,6 +77,8 @@ def gen_adv(model, trainloader, testloader, device):
     eps = 0.15
     train_acc, adv_acc, train_n = 0, 0, 0
     normal_data, adv_data = None, None
+    attack = foolbox.attacks.FGSM()
+    fmodel = foolbox.models.PyTorchModel(model, bounds=(-1, 1), device=device)
     for i, data in enumerate(trainloader,0):
         input, label = data
         input, label = Variable(input.to(device)), Variable(label.to(device))
@@ -89,8 +90,7 @@ def gen_adv(model, trainloader, testloader, device):
         acc = pred.eq(label.data.view_as(pred)).cpu().sum()
         train_acc += acc
         
-        
-        input_adv = attacks.fgsm(model, input, label, loss_func, eps)
+        input_adv, _, success = attack(fmodel, input, label, epsilons=eps)
         pred_adv = model(input_adv)
         
         pred_adv = pred_adv.data.max(1, keepdim=True)[1]

@@ -15,7 +15,7 @@ from APEGANModels import Generator, Discriminator
 # -*- coding: utf-8 -*-
 
 import os
-import argparse
+
 
 import torch
 import torch.nn as nn
@@ -46,7 +46,7 @@ def show_images(e, x, x_adv, x_fake, save_dir):
     plt.axis("off")
     plt.savefig(os.path.join(save_dir, "result_{}.png".format(e)))
 
-def main():
+def APEGAN_Train():
     lr = 0.0002
     num_epochs = 2
     batch_size = 128
@@ -120,4 +120,4 @@ def main():
     show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
     G.train()
 
-main()
+APEGAN_Train()
