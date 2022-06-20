@@ -10,11 +10,6 @@ from torch.autograd import Variable
 from tqdm import tqdm
 from APEGANModels import Generator
 
-def accuracy(y, t):
-    pred = y.data.max(1, keepdim=True)[1]
-    acc = pred.eq(t.data.view_as(pred)).cpu().sum()
-    return acc
-
 
 def APEGAN_Test(gan_path, model_path, channels, model, testloader, device):
     eps = 0.15
@@ -23,14 +18,11 @@ def APEGAN_Test(gan_path, model_path, channels, model, testloader, device):
     model_point = torch.load(model_path)
     gan_point = torch.load(gan_path)
 
-    #basic_model = model()
-
-    #model = basic_model().to(device)
     model.load_state_dict(model_point["state_dict"])
 
     G = Generator(channels).to(device)
     G.load_state_dict(gan_point["generator"])
-    #loss_cre = nn.CrossEntropyLoss().to(device)
+
     attack = foolbox.attacks.FGSM()
     fmodel = foolbox.models.PyTorchModel(model, bounds=(-1, 1), device=device)
     model.eval(), G.eval()
@@ -38,16 +30,15 @@ def APEGAN_Test(gan_path, model_path, channels, model, testloader, device):
     for input, label in tqdm(test_loader, total=len(test_loader), leave=False):
         input, label = Variable(input.to(device)), Variable(label.to(device))
 
-        pred = model(input)
-        normal_acc += accuracy(pred, label)
+        normal_acc = foolbox.utils.accuracy(fmodel, input, label) * 100
 
         input_adv, _, success = attack(fmodel, input, label, epsilons=eps)
-        pred_adv = model(input_adv)
-        adv_acc += accuracy(pred_adv, label)
+
+        adv_acc = foolbox.utils.accuracy(fmodel, input_adv, label) * 100
 
         input_ape = G(input_adv)
-        pred_ape = model(input_ape)
-        ape_acc += accuracy(pred_ape, label)
+
+        ape_acc = foolbox.utils.accuracy(fmodel, input_ape, label) * 100
         n += label.size(0)
     print("Accuracy: normal {:.6f}, fgsm {:.6f}, ape {:.6f}".format(
         normal_acc / n * 100,
