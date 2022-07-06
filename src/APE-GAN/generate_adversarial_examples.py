@@ -3,13 +3,12 @@ from math import gamma
 import sys
 from tkinter import Variable
 sys.path.append('./utils')
-sys.path.append('./src/functions')
+sys.path.append('./src/Models')
                 
 import dataloader
 import device
 import foolbox
-import basic_nn
-
+import upgraded_net
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -18,20 +17,20 @@ from torch.autograd import Variable
 
 
 
-def gen_adv(model, trainloader, testloader, device):
+def gen_adv(trainloader, testloader, device, input_channel=1, classes=10):
     num_epochs=2
     lr = 0.0002
     momentum = 0.9
     w_decay = 0.001
     milestones= [50,75]
     gamma = 0.1
-    #model = basicCNN() #.to(device)
+    model = upgraded_net.simple_net_upgraded(input_channel, classes).to(device)
     
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
     learningrate_scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=gamma) # calc new learning rate
     loss_func = nn.CrossEntropyLoss().to(device)
     
-    
+    print("Training model for adversarial examples...")
     for epoch in range(num_epochs):
         train_loss, train_acc, train_n = 0, 0, 0
         test_loss, test_acc, test_n = 0, 0, 0
@@ -79,13 +78,14 @@ def gen_adv(model, trainloader, testloader, device):
     normal_data, adv_data = None, None
     attack = foolbox.attacks.FGSM()
     fmodel = foolbox.models.PyTorchModel(model, bounds=(-1, 1), device=device)
+    print("Generating adversarial examples...")
     for i, data in enumerate(trainloader,0):
         input, label = data
         input, label = Variable(input.to(device)), Variable(label.to(device))
         pred = model(input)
         #accuarcy
         pred = pred.data.max(1, keepdim=True)[1]
-        print(pred)
+        #print(pred)
         
         acc = pred.eq(label.data.view_as(pred)).cpu().sum()
         train_acc += acc
@@ -112,7 +112,7 @@ def gen_adv(model, trainloader, testloader, device):
 
 
 
-gen_adv(basic_nn.basic_Net, dataloader.train_dataloader , dataloader.test_dataloader , device.device)           
+#gen_adv(basic_nn.basic_Net, dataloader.train_dataloader , dataloader.test_dataloader , device.device)           
             
             
             
