@@ -46,7 +46,7 @@ def show_images(e, x, x_adv, x_fake, save_dir):
     plt.axis("off")
     plt.savefig(os.path.join(save_dir, "result_{}.png".format(e)))
 
-def APEGAN_Train():
+def APEGAN_Train(input_channel=1):
     lr = 0.0002
     num_epochs = 2
     batch_size = 128
@@ -63,7 +63,6 @@ def APEGAN_Train():
     train_data = TensorDataset(train_data["normal"], train_data["adv"])
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
-    input_channel = 1 #if args.data == "mnist" else 3
     G = Generator(input_channel).to(device)
     D = Discriminator(input_channel).to(device)
 
@@ -120,4 +119,4 @@ def APEGAN_Train():
     show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
     G.train()
 
-APEGAN_Train()
+#APEGAN_Train()

@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -17,7 +18,7 @@ class Generator(nn.Module):
         out = F.leaky_relu(self.bn1(self.conv1(x)))
         out = F.leaky_relu(self.bn2(self.conv2(out)))
         out = F.leaky_relu(self.bn3(self.deconv3(out)))
-        out = F.tanh(self.deconv4(out))
+        out = torch.tanh(self.deconv4(out))
         return out
 
 
@@ -39,5 +40,5 @@ class Discriminator(nn.Module):
         out = F.leaky_relu(self.conv1(x))
         out = F.leaky_relu(self.bn2(self.conv2(out)))
         out = F.leaky_relu(self.bn3(self.conv3(out)))
-        out = F.sigmoid(self.fc4(out.view(out.size(0), -1)))
+        out = torch.sigmoid(self.fc4(out.view(out.size(0), -1)))
         return out
