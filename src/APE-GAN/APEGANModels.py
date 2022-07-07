@@ -34,7 +34,8 @@ class Discriminator(nn.Module):
         if input_channels == 1:
             self.fc4 = nn.Linear(1024, 1)
         else:
-            self.fc4 = nn.Linear(2304, 1)
+            self.fc4 = nn.Linear(1024, 1)
+            #self.fc4 = nn.Linear(2304, 1)
 
     def forward(self, x):
         out = F.leaky_relu(self.conv1(x))

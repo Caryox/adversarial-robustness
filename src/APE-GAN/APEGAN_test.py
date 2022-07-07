@@ -9,9 +9,9 @@ import torch
 from torch.autograd import Variable
 from tqdm import tqdm
 from APEGANModels import Generator
+import attack_and_eval
 
-
-def APEGAN_Test(gan_path, model_path,  testloader, device, input_channel=1, classes=10, eps=0.15):
+def APEGAN_Test(gan_path, model_path,  testloader, device, attack_name="FGSM", input_channel=1, classes=10, eps=0.15):
     test_loader = testloader
 
     model_point = torch.load(model_path)
@@ -21,28 +21,27 @@ def APEGAN_Test(gan_path, model_path,  testloader, device, input_channel=1, clas
 
     G = Generator(input_channel).to(device)
     G.load_state_dict(gan_point["generator"])
-
-    attack = foolbox.attacks.FGSM()
-    fmodel = foolbox.models.PyTorchModel(model, bounds=(-1, 1), device=device)
     model.eval(), G.eval()
+    attack, fmodel = attack_and_eval.attack(model, attack_name)
+    
     normal_acc, adv_acc, ape_acc, n = 0, 0, 0, 0
     print("Start testing...")
     for input, label in tqdm(test_loader, total=len(test_loader), leave=False):
         input, label = Variable(input.to(device)), Variable(label.to(device))
 
-        normal_acc = foolbox.utils.accuracy(fmodel, input, label) * 100
+        normal_acc = attack_and_eval.evaluation(fmodel, input, label)
 
         input_adv, _, success = attack(fmodel, input, label, epsilons=eps)
 
-        adv_acc = foolbox.utils.accuracy(fmodel, input_adv, label) * 100
+        adv_acc = attack_and_eval.evaluation(fmodel, input_adv, label)
 
         input_ape = G(input_adv)
 
-        ape_acc = foolbox.utils.accuracy(fmodel, input_ape, label) * 100
+        ape_acc = attack_and_eval.evaluation(fmodel, input_ape, label)
         n += label.size(0)
-    print("Accuracy: normal {:.6f}, fgsm {:.6f}, ape {:.6f}".format(
-        normal_acc / n * 100,
-        adv_acc / n * 100,
+    print("Accuracy: normal {:.6f}".format(
+        normal_acc / n * 100))
+    print("Accuracy: " + str(attack_name) + " {:.6f}".format(
+        adv_acc / n * 100))
+    print("Accuracy: APEGAN {:.6f}".format(
         ape_acc / n * 100))
-
-#APEGAN_Test("./checkpoint/test/2.tar", "./src/APE-GAN/cnn.tar", 1, basic_nn.basic_Net,  dataloader.test_dataloader, device.device)
