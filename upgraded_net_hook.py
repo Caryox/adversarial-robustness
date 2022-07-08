@@ -40,7 +40,7 @@ class simple_net_upgraded(nn.Module): # This is the same as the previous one, bu
 		return x
 
 
-activation = {} #this will store values from fc2 layer, which would be then used as input for the few2decide
+activation = {} #this will store the weight matrix from fc2 layer, which would be then used as input for the few2decide
 def get_activation(name):
     def hook(model, input, output):
         activation[name] = output.detach()
