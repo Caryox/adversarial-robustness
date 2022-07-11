@@ -70,7 +70,6 @@ def APEGAN_Train(input_channel=1):
     opt_D = optim.Adam(D.parameters(), lr=lr, betas=(0.5, 0.999))
     loss_bce = nn.BCELoss()
     loss_mse = nn.MSELoss()
-    #cudnn.benchmark = True
 
     print_str = "\t".join(["{}"] + ["{:.6f}"] * 2)
     print("\t".join(["{:}"] * 3).format("Epoch", "Gen_Loss", "Dis_Loss"))
@@ -118,5 +117,3 @@ def APEGAN_Train(input_channel=1):
     input_fake = G(Variable(input_adv_tmp.to(device))).data
     show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
     G.train()
-
-#APEGAN_Train()

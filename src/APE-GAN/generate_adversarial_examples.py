@@ -4,7 +4,7 @@ import sys
 from tkinter import Variable
 sys.path.append('./utils')
 sys.path.append('./src/Models')
-                
+import attack_and_eval               
 import dataloader
 import device
 import foolbox
@@ -76,8 +76,8 @@ def gen_adv(trainloader, testloader, device, input_channel=1, classes=10):
     eps = 0.15
     train_acc, adv_acc, train_n = 0, 0, 0
     normal_data, adv_data = None, None
-    attack = foolbox.attacks.FGSM()
-    fmodel = foolbox.models.PyTorchModel(model, bounds=(-1, 1), device=device)
+    model.eval()
+    attack, fmodel = attack_and_eval.attack(model, "FGSM")
     print("Generating adversarial examples...")
     for i, data in enumerate(trainloader,0):
         input, label = data
@@ -85,7 +85,6 @@ def gen_adv(trainloader, testloader, device, input_channel=1, classes=10):
         pred = model(input)
         #accuarcy
         pred = pred.data.max(1, keepdim=True)[1]
-        #print(pred)
         
         acc = pred.eq(label.data.view_as(pred)).cpu().sum()
         train_acc += acc
@@ -108,14 +107,3 @@ def gen_adv(trainloader, testloader, device, input_channel=1, classes=10):
     print("Accuracy(normal) {:.6f}, Accuracy(FGSM) {:.6f}".format(train_acc / train_n * 100, adv_acc / train_n * 100))
     torch.save({"normal": normal_data, "adv": adv_data}, "./src/APE-GAN/data.tar")
     torch.save({"state_dict": model.state_dict()}, "./src/APE-GAN/cnn.tar")
-
-
-
-
-#gen_adv(basic_nn.basic_Net, dataloader.train_dataloader , dataloader.test_dataloader , device.device)           
-            
-            
-            
-            
-    
-    

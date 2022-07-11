@@ -31,10 +31,8 @@ class Discriminator(nn.Module):
         self.bn2 = nn.BatchNorm2d(128)
         self.conv3 = nn.Conv2d(128, 256, 3, stride=2)
         self.bn3 = nn.BatchNorm2d(256)
-        if input_channels == 1:
-            self.fc4 = nn.Linear(1024, 1)
-        else:
-            self.fc4 = nn.Linear(2304, 1)
+        self.fc4 = nn.Linear(1024, 1)
+
 
     def forward(self, x):
         out = F.leaky_relu(self.conv1(x))
