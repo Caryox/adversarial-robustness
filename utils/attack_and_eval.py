@@ -3,9 +3,9 @@ sys.path.append('./utils')
 import foolbox
 import device
 
-def attack(model, attack):
+def attack(model, attack, bounds=(-1, 1)):
     """ Returns the attack object and the foolbox model. Use a loop to call this function for each attack. """
-    fmodel = foolbox.models.PyTorchModel(model, bounds=(-1, 1), device=device.device)
+    fmodel = foolbox.models.PyTorchModel(model, bounds=bounds, device=device.device)
     if(attack == "FGSM"):
         attack = foolbox.attacks.FGSM()
     elif(attack == "L2DeepFool"):
