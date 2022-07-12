@@ -62,7 +62,7 @@ def test(skip = False):
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
     loss_func = nn.CrossEntropyLoss().to(device.device)
     if skip:
-        model_point = torch.load("./utils/few2decide_model.tar")
+        model_point = torch.load("./utils/few2decide_model.tar", map_location=device.device)
         model.load_state_dict(model_point["state_dict"])
     else:
         model.train()
@@ -80,15 +80,17 @@ def test(skip = False):
         torch.save({"state_dict": model.state_dict()}, "./utils/few2decide_model.tar")
     return few_two_decide(model, trainloader)
 
-sums, pred = test(True)
+pred, labels = test(True)
 
 #print(sums)
-print(sums.shape)
 print(pred.shape)
-for i in range(len(pred)):
-    print(sums[i].argmax(), pred[i])
+print(labels.shape)
+for i in range(len(labels)):
+    print(pred[i].argmax(), labels[i])
     print("\n")
 
-from sklearn.metrics import accuracy_score
-print(accuracy_score(pred.item(), sums.argmax().item()))
+# To Do
+"""from sklearn.metrics import accuracy_score
+print(accuracy_score(labels.item(), pred.argmax().item()))
 #print("Few2Decide :" + str(sums[0].argmax()) + " " + str(pred[0]))
+"""
