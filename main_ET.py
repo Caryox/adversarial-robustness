@@ -12,6 +12,7 @@ from src import Models as M
 from src import results as pretrained
 from utils import param 
 from utils import dataloader as dtl
+#from src import APEGAN #@Daniel: rename APE-GAN to APEGAN
 
 ############################################
 # Loading Device
@@ -22,19 +23,11 @@ device = utils.device()
 
 
 # Loading Data: all of our dataloaders can be found at https://github.com/Caryox/adversial-robustness/blob/main/utils/dataloader.py
-# Using transfrom from torchvision because can not find our transforms function.
-# Tobe replaced later
-import torchvision.transforms as transforms 
-transform = transforms.Compose([
-                                transforms.ToTensor(), 
-                                transforms.Normalize((0.5,), (0.5,)),
-])
+# Transforms are already in dataloader modul
 
 #MNIST
-#@Kimmy: Am I abusing your functions? 
-dataloader_test = dtl.test_dataloader()
-dataloader_train = dtl.train_dataloader()
-dataloader_validation = dtl.validation_dataloader()
+dataloader_train, dataloader_validation, dataloader_test = dtl.train_dataloader, dtl.validation_dataloader, dtl.test_dataloader
+#dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False, num_of_worker=param.num_of_worker, random_seed=1337) #Kimmy: random_seed austauschen?
 
 #CIFAR10: tobe done after MNIST
 
@@ -42,9 +35,12 @@ dataloader_validation = dtl.validation_dataloader()
 # Loading NN
 #@Daniel&Kimmy: APEGAN has its own main file. How to handle APEGAN here?
 
-basis_nn= M.upgraded_net()
-ensemble_nn1= M.upgraded_net_ensemble1()
-ensemble_nn2= M.upgraded_net_ensemble2()
+basis_nn= M.upgraded_net
+ensemble_nn1= M.upgraded_net_ensemble1
+ensemble_nn2= M.upgraded_net_ensemble2
+
+#APEGAN
+#APEGAN=APEGAN.APEGAN_main
 
 ############################################
 # We wanted to train, test and validate each of the model separately then compair the results with ensemble's result
