@@ -29,12 +29,10 @@ def few_two_decide(model, dataloader):
     print("Get matrix")
     weight_matrix = upgraded_net_hook.activation['linear']
     avg_matrix = upgraded_net_hook.average_pooling['avg_pooling']
-    
     print("---Hadamard product---")
-    values_mul = torch.mul(weight_matrix,avg_matrix) # 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
-
+    values_mul = torch.mul(weight_matrix,avg_matrix[0]) # 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
     print("--sorted---")
-    values_sort, index = torch.sort(values_mul, dim=1) # 2. sort the connections calculation results of each neuron from min to max and get the V2
+    values_sort, index = torch.sort(values_mul, dim=0) # 2. sort the connections calculation results of each neuron from min to max and get the V2
 
     print("---Clipping---")
 
@@ -46,8 +44,11 @@ def few_two_decide(model, dataloader):
     print("---Sum---")
 
     #values_sum = torch.sum(values_clip, dim=0) #Prediction Score
-    values_sum = values_clip.sum(1, keepdim=True)
-    return values_sum
+    values_sum = values_clip.sum(0)
+    
+    return values_sum, labels
+
+
 
 def test(skip = False):
     num_epochs=2
@@ -79,7 +80,15 @@ def test(skip = False):
         torch.save({"state_dict": model.state_dict()}, "./utils/few2decide_model.tar")
     return few_two_decide(model, trainloader)
 
-sums = test(True)
+sums, pred = test(True)
 
-print(sums)
+#print(sums)
+print(sums.shape)
+print(pred.shape)
+for i in range(len(pred)):
+    print(sums[i].argmax(), pred[i])
+    print("\n")
 
+from sklearn.metrics import accuracy_score
+print(accuracy_score(pred.item(), sums.argmax().item()))
+#print("Few2Decide :" + str(sums[0].argmax()) + " " + str(pred[0]))
