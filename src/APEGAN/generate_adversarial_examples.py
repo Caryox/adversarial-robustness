@@ -106,8 +106,8 @@ def gen_adv(model, trainloader, testloader, device):
             adv_data = torch.cat((adv_data, input_adv))
 
     print("Accuracy(normal) {:.6f}, Accuracy(FGSM) {:.6f}".format(train_acc / train_n * 100, adv_acc / train_n * 100))
-    torch.save({"normal": normal_data, "adv": adv_data}, "./src/APE-GAN/data.tar")
-    torch.save({"state_dict": model.state_dict()}, "./src/APE-GAN/cnn.tar")
+    torch.save({"normal": normal_data, "adv": adv_data}, "./src/APEGAN/data.tar")
+    torch.save({"state_dict": model.state_dict()}, "./src/APEGAN/cnn.tar")
 
 
 

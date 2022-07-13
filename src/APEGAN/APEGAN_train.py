@@ -42,7 +42,7 @@ def show_images(e, x, x_adv, x_fake, save_dir):
 
         axes[2, i].imshow(x_fake[i].cpu().numpy().transpose((1, 2, 0)))
         # axes[2, i].imshow(x_fake[i, 0].cpu().numpy(), cmap="gray")
-        axes[2, i].set_title("APE-GAN")
+        axes[2, i].set_title("APEGAN")
     plt.axis("off")
     plt.savefig(os.path.join(save_dir, "result_{}.png".format(e)))
 
@@ -56,7 +56,7 @@ def APEGAN_Train():
     check_path = "./checkpoint/test"
     os.makedirs(check_path, exist_ok=True)
 
-    train_data = torch.load("./src/APE-GAN/data.tar")
+    train_data = torch.load("./src/APEGAN/data.tar")
     x_tmp = train_data["normal"][:5]
     input_adv_tmp = train_data["adv"][:5]
 

@@ -45,4 +45,4 @@ def APEGAN_Test(gan_path, model_path, channels, model, testloader, device):
         adv_acc / n * 100,
         ape_acc / n * 100))
 
-APEGAN_Test("./checkpoint/test/2.tar", "./src/APE-GAN/cnn.tar", 1, basic_nn.basic_Net,  dataloader.test_dataloader, device.device)
+APEGAN_Test("./checkpoint/test/2.tar", "./src/APEGAN/cnn.tar", 1, basic_nn.basic_Net,  dataloader.test_dataloader, device.device)
