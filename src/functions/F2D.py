@@ -1,7 +1,11 @@
 import sys
+from typing import final
+
+#import torchmetrics
 sys.path.append('./utils')
 sys.path.append('./src/Models')
 import upgraded_net_hook
+import param
 import dataloader
 import torch
 import torch.nn as nn
@@ -10,11 +14,6 @@ import torch.optim as optim
 import device
 from torch.autograd import Variable
 
-"""
-from torchvision import models
-from torchsummary import summary
-
-model = upgraded_net_hook.ResNet(upgraded_net_hook.ResidualBlock, [3, 4, 6, 3])"""
 
 def few_two_decide(model, dataloader):
     model.eval()
@@ -44,13 +43,14 @@ def few_two_decide(model, dataloader):
     print("---Sum---")
 
     #values_sum = torch.sum(values_clip, dim=0) #Prediction Score
-    values_sum = values_clip.sum(0)
-    
+    values_sum = values_clip.sum(0)    
     return values_sum, labels
 
 
-
-def test(skip = False):
+#################
+###   Train   ###
+#################
+def train_few_two_decide(skip= False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
     num_epochs=2
     lr = 0.0002
     momentum = 0.9
@@ -78,19 +78,48 @@ def test(skip = False):
                 optimizer.step()
                 pred = pred.data.max(1, keepdim=True)[1]
         torch.save({"state_dict": model.state_dict()}, "./utils/few2decide_model.tar")
-    return few_two_decide(model, trainloader)
+    pred, labels = few_two_decide(model, trainloader)
+    acc_train = accuracy_train(pred, labels)
+    print("Train-Acc: ", acc_train)
+    return 
 
-pred, labels = test(True)
+# Train Accuaracy - F2D
 
-#print(sums)
-print(pred.shape)
-print(labels.shape)
-for i in range(len(labels)):
-    print(pred[i].argmax(), labels[i])
-    print("\n")
+def accuracy_train(pred, labels):
+    count = 0
+    for i in range(len(labels)):
+        #print(pred[i].argmax(), labels[i])
+        if (pred[i].argmax() == labels[i]):
+            count += 1
+    acc = 100*(count/len(labels))        
+    return acc
 
-# To Do
-"""from sklearn.metrics import accuracy_score
-print(accuracy_score(labels.item(), pred.argmax().item()))
-#print("Few2Decide :" + str(sums[0].argmax()) + " " + str(pred[0]))
-"""
+#################
+###    Test   ###
+#################
+def test_few_two_decide():
+    model = upgraded_net_hook.ResNet20().to(device.device)
+    model_point = torch.load("./utils/few2decide_model.tar", map_location=device.device)
+    model.load_state_dict(model_point["state_dict"])
+
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for data in dataloader.test_dataloader:
+            images, labels = data
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+        pred, label = few_two_decide(model, dataloader.test_dataloader)
+    
+    print(f'Resnet - Accuracy of the network on the 10000 test images: {100 * correct // total} %')
+    acc_test = accuracy_train(pred, label)
+    print("Test-Acc: ",acc_test)
+    #return pred, label
+
+print ("Train:")
+train_few_two_decide(True)
+
+print("Test:")
+test_few_two_decide()
