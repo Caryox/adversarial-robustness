@@ -28,6 +28,12 @@ def few_two_decide(model, dataloader):
     print("Get matrix")
     weight_matrix = upgraded_net_hook.activation['linear']
     avg_matrix = upgraded_net_hook.average_pooling['avg_pooling']
+    #avg_matrix = avg_matrix.mean(dim=(-2, -1))
+    
+    #print(weight_matrix.size())
+
+    #print(avg_matrix.size())
+    
     print("---Hadamard product---")
     values_mul = torch.mul(weight_matrix,avg_matrix[0]) # 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
     print("--sorted---")
@@ -37,9 +43,15 @@ def few_two_decide(model, dataloader):
 
     min_quantile = torch.quantile(values_sort, 0.3).data.tolist()
     max_quantile = torch.quantile(values_sort, 0.6).data.tolist()
+    
+    max = values_sort >= max_quantile
+    min = values_sort <= min_quantile
+    values_sort[max] = 0
+    values_sort[min] = 0
 
-    values_clip = torch.clamp(values_sort,min=min_quantile, max=max_quantile, out=None) # In this step the nd Tensor should get the top and bottom 30 percent of the values set to zero
 
+    values_clip = values_sort #torch.clamp(values_sort,min=min_quantile, max=max_quantile, out=None) # In this step the nd Tensor should get the top and bottom 30 percent of the values set to zero
+    #print(values_clip)
     print("---Sum---")
 
     #values_sum = torch.sum(values_clip, dim=0) #Prediction Score
@@ -119,7 +131,7 @@ def test_few_two_decide():
     #return pred, label
 
 print ("Train:")
-train_few_two_decide(True)
+train_few_two_decide(False).to(torch.device("mps"))
 
 print("Test:")
 test_few_two_decide()
