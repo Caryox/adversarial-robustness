@@ -3,7 +3,7 @@ from typing import final
 
 #import torchmetrics
 sys.path.append('./utils')
-sys.path.append('./src/Models')
+sys.path.append('././src/Models')
 import upgraded_net_hook
 import param
 import dataloader
@@ -37,15 +37,19 @@ def few_two_decide(model, dataloader):
     print("---Hadamard product---")
     values_mul = torch.mul(weight_matrix,avg_matrix[0]) # 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
     print("--sorted---")
-    values_sort, index = torch.sort(values_mul, dim=0) # 2. sort the connections calculation results of each neuron from min to max and get the V2
+
+    values_sort, index = torch.sort(values_mul, dim=2) # 2. sort the connections calculation results of each neuron from min to max and get the V2
+    #values_sort, _ = values_mul.sort(0)
+            
+    #print(values_sort)
 
     print("---Clipping---")
 
     min_quantile = torch.quantile(values_sort, 0.3).data.tolist()
     max_quantile = torch.quantile(values_sort, 0.6).data.tolist()
-    
     max = values_sort >= max_quantile
     min = values_sort <= min_quantile
+    
     values_sort[max] = 0
     values_sort[min] = 0
 
@@ -55,7 +59,8 @@ def few_two_decide(model, dataloader):
     print("---Sum---")
 
     #values_sum = torch.sum(values_clip, dim=0) #Prediction Score
-    values_sum = values_clip.sum(0)    
+    values_sum = values_clip.sum(dim=0)
+    print(values_sum.size())    
     return values_sum, labels
 
 
@@ -67,8 +72,6 @@ def train_few_two_decide(skip= False): #model, num_epochs, random_seed, lr, mome
     lr = 0.0002
     momentum = 0.9
     w_decay = 0.001
-    milestones= [50,75]
-    gamma = 0.1
     model = upgraded_net_hook.ResNet20().to(device.device)
     trainloader = dataloader.train_dataloader
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
@@ -131,7 +134,7 @@ def test_few_two_decide():
     #return pred, label
 
 print ("Train:")
-train_few_two_decide(False).to(torch.device("mps"))
+train_few_two_decide(False)
 
 print("Test:")
 test_few_two_decide()
