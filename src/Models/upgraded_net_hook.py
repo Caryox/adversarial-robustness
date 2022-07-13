@@ -135,13 +135,13 @@ class ResNet(nn.Module):
     def forward(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
         out = self.layer1(out)
-        print(out.size())
+        #print(out.size())
         out = self.layer2(out)
-        print(out.size())
+        #print(out.size())
         out = self.layer3(out)
-        print(out.size())
+        #print(out.size())
         out = self.layer4(out)
-        print(out.size())
+        #print(out.size())
         out = self.avg_pooling(out)
         out = out.view(out.size(0), -1)
         out = self.linear(out)
@@ -156,17 +156,11 @@ def ResNet32():
 
 
 def ResNet44():
-    return ResNet(Bottleneck, [3, 4, 11, 3])
+    return ResNet(BasicBlock, [3, 4, 11, 3])
 
 
 def ResNet56():
-    return ResNet(Bottleneck, [3, 4, 8, 3])
-
-
-def ResNet152():
-    return ResNet(Bottleneck, [3, 8, 36, 3])
-
-
+    return ResNet(BasicBlock, [3, 4, 8, 3])
 
 
 activation = {} #this will store values from fc2 layer, which would be then used as input for the few2decide

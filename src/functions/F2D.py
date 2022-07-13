@@ -37,14 +37,11 @@ def few_two_decide(model, dataloader):
     print("---Hadamard product---")
     values_mul = torch.mul(weight_matrix,avg_matrix[0]) # 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
     print("--sorted---")
-
     values_sort, index = torch.sort(values_mul, dim=2) # 2. sort the connections calculation results of each neuron from min to max and get the V2
-    #values_sort, _ = values_mul.sort(0)
-            
+    #values_sort, _ = values_mul.sort(0) 
     #print(values_sort)
 
     print("---Clipping---")
-
     min_quantile = torch.quantile(values_sort, 0.3).data.tolist()
     max_quantile = torch.quantile(values_sort, 0.6).data.tolist()
     max = values_sort >= max_quantile
@@ -52,22 +49,20 @@ def few_two_decide(model, dataloader):
     
     values_sort[max] = 0
     values_sort[min] = 0
-
-
     values_clip = values_sort #torch.clamp(values_sort,min=min_quantile, max=max_quantile, out=None) # In this step the nd Tensor should get the top and bottom 30 percent of the values set to zero
     #print(values_clip)
+    
     print("---Sum---")
-
     #values_sum = torch.sum(values_clip, dim=0) #Prediction Score
     values_sum = values_clip.sum(dim=0)
-    print(values_sum.size())    
+    #print(values_sum.size())    
     return values_sum, labels
 
 
 #################
 ###   Train   ###
 #################
-def train_few_two_decide(skip= False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
+def train_few_two_decide(skip=False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
     num_epochs=2
     lr = 0.0002
     momentum = 0.9
