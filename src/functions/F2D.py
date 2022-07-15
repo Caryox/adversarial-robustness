@@ -14,6 +14,7 @@ import numpy as np
 import torch.optim as optim
 import device
 from torch.autograd import Variable
+from tqdm import tqdm
 
 def few_two_decide_v2(model, inputs): 
     model.linear.register_forward_hook(upgraded_net_hook.get_activation('linear'))
@@ -116,12 +117,12 @@ def few_two_decide_v2(model, inputs):
 ###   Train   ###
 #################
 def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
-    num_epochs=2
+    num_epochs=1
     lr = 0.0002
     momentum = 0.9
     w_decay = 0.001
     model = upgraded_net_hook.ResNet44().to(device.device)
-    #model.apply(upgraded_net_hook.weights_init_uniform)
+    model.apply(upgraded_net_hook.weights_init_uniform)
     trainloader = dataloader.train_dataloader
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
     loss_func = nn.CrossEntropyLoss().to(device.device)
@@ -130,16 +131,16 @@ def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, mo
         model.load_state_dict(model_point["state_dict"])
     else:
         model.train()
-        
+        #acc = 0
         for epoch in range(num_epochs):
             print("Epoch: ", epoch)
          
             # placeholder for batch features
-            for i, data in enumerate(trainloader):
-                inputs, labels = data
-                inputs, labels = Variable(inputs.to(device.device)), Variable(labels.to(device.device))
-                f2d = few_two_decide_v2(model, inputs)
-                #print(f2d[0])
+            #for i, data in enumerate(trainloader):
+            for input, label in tqdm(trainloader, total=len(trainloader), leave=False):
+                inputs, labels = Variable(input.to(device.device)), Variable(label.to(device.device))
+                pred = few_two_decide_v2(model, inputs)
+                #print(pred)
                 pred = model(inputs)
                 #print(pred[0])
                 loss = loss_func(pred, labels)
@@ -147,11 +148,10 @@ def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, mo
                 loss.backward()
                 optimizer.step()
                 pred = pred.data.max(1, keepdim=True)[1]
+                #acc += accuracy_train(pred, labels)
         torch.save({"state_dict": model.state_dict()}, "./utils/few2decide_model.tar")
         #pred, labels = few_two_decide(model, trainloader)
-        #print(labels.size())
-        acc_train = accuracy_train(pred, labels)
-        print("Train-Acc: ", acc_train)
+        #print("Train-Acc: ", acc)
         return pred, labels
 
 """def train_few_two_decide(skip=False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
@@ -213,18 +213,15 @@ def test_few_two_decide():
     total = 0
     f2d = 0
     with torch.no_grad():
-        for data in dataloader.test_dataloader:
-            images, labels = data
-            images, labels = Variable(images.to(device.device)), Variable(labels.to(device.device))
+        for input, label in tqdm(dataloader.test_dataloader, total=len(dataloader.test_dataloader), leave=False):
+            images, labels = Variable(input.to(device.device)), Variable(label.to(device.device))
             outputs = model(images)
-            print(outputs[0])
             pred = few_two_decide_v2(model, images)
-            print(pred[0])
             _, predicted = torch.max(outputs.data, 1)
             __, f2d_pred = torch.max(pred.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            print(pred.shape)
+
             f2d += (f2d_pred == labels).sum().item()
     print(f'Resnet - Accuracy of the network on the 10000 test images: {100 * correct // total} %')
     print(f'F2D - Accuracy of the network on the 10000 test images: {100 * f2d // total} %')
