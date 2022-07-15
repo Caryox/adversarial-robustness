@@ -5,6 +5,7 @@ from unicodedata import decimal
 #import torchmetrics
 sys.path.append('./utils')
 sys.path.append('././src/Models')
+import attack_and_eval  
 import upgraded_net_hook
 import param
 import dataloader
@@ -258,9 +259,70 @@ def test_few_two_decide():
     print("Test-Acc: ",acc_test)
     return pred, label"""
 
+def generate_adversarial_examples(model, data_loader, device, data_path, eps=0.15):
+    normal_data, adv_data = None, None
+    model = model
+    model_point = torch.load("./utils/few2decide_model.tar", map_location=device)
+    model.load_state_dict(model_point["state_dict"])
+    model.eval()
+    attacks, fmodel = attack_and_eval.attack(model, "FGSM")
+    print("Generating adversarial examples...")
+    for i, data in enumerate(data_loader,0):
+        input, label = data
+        input, label = Variable(input.to(device)), Variable(label.to(device))
+
+        input_adv, _ = attacks(fmodel, input, label, epsilons=eps)
+        
+        input, input_adv = input.data, input_adv.data
+        if normal_data is None:
+            normal_data, adv_data = input, input_adv
+        else:
+            normal_data = torch.cat((normal_data, input))
+            adv_data = torch.cat((adv_data, input_adv))
+    torch.save({"normal": normal_data, "adv": adv_data}, data_path)
+
+
+def test_attack(testloader, device, eps=0.15):
+    test_loader = testloader
+    model = upgraded_net_hook.ResNet44().to(device)
+    model_point = torch.load("./utils/few2decide_model.tar", map_location=device)
+    model.load_state_dict(model_point["state_dict"])
+    model.eval()
+    normal_acc, f2d_acc, adv_acc, normal_adv_acc,f2d_adv_acc, n = 0, 0, 0, 0, 0, 0
+    attack, fmodel = attack_and_eval.attack(model, "FGSM", (-255, 255))
+    for input, label in tqdm(test_loader, total=len(test_loader), leave=False):
+            input, label = Variable(input.to(device)), Variable(label.to(device))
+
+            normal_pred = model(input)
+            f2d_pred = few_two_decide_v2(model, input)
+            input_adv, _, success = attack(fmodel, input, label, epsilons=eps)
+            normal_adv_pred = model(input_adv)
+            f2d_adv_pred = few_two_decide_v2(model, input_adv)
+
+
+            _, normal_pred = torch.max(normal_pred.data, 1)
+            __, f2d_pred = torch.max(f2d_pred.data, 1)
+            _, normal_adv_pred = torch.max(normal_adv_pred.data, 1)
+            __, f2d_adv_pred = torch.max(f2d_adv_pred.data, 1)
+            n += label.size(0)
+            normal_acc += (normal_pred == label).sum().item()
+            f2d_acc += (f2d_pred == label).sum().item()
+            normal_adv_acc += (normal_adv_pred == label).sum().item()
+            f2d_adv_acc += (f2d_adv_pred == label).sum().item()
+
+
+    print(f'Resnet - Accuracy of the network on the normal test images: {100 * normal_acc // n} %')
+    print(f'F2D - Accuracy of the network on the 10000 test images: {100 * f2d_acc // n} %')
+    print(f'Resnet - Accuracy of the network on the adversarial test images: {100 * normal_adv_acc // n} %')
+    print(f'F2D - Accuracy of the network on the adversarial test images: {100 * f2d_adv_acc // n} %')
+
 print ("Train:")
-train_few_two_decide_v2(False)
+#train_few_two_decide_v2(False)
 #print(pred, labels)
 
 print("Test:")
-test_few_two_decide()
+#test_few_two_decide()
+
+#generate_adversarial_examples(upgraded_net_hook.ResNet44().to(device.device), dataloader.test_dataloader, device.device, "./utils/adv_data.tar")
+
+test_attack(dataloader.test_dataloader, device.device, eps=0.15)

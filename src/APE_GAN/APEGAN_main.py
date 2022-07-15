@@ -17,7 +17,7 @@ def main(train_loader, test_loader, device, input_channel=1, classes=10, eps=0.1
     #APEGAN_train.APEGAN_Train(input_channel)
     attack = ["FGSM", "PGD", "L2DeepFool", "C&W"]
     for i in range(len(attack)):
-        APEGAN_test.APEGAN_Test("./checkpoint/test/2.tar", "./src/APE-GAN/cnn.tar", test_loader, device, attack[i], input_channel, classes, eps)
+        APEGAN_test.APEGAN_Test("./checkpoint/test/2.tar", "./src/APE_GAN/cnn.tar", test_loader, device, attack[i], input_channel, classes, eps)
     #APEGAN_test.APEGAN_Test("./checkpoint/test/2.tar", "./src/APE-GAN/cnn.tar",  test_loader, device, attack, input_channel, classes)
 
 #main(dataloader.train_dataloader , dataloader.test_dataloader, device.device )
