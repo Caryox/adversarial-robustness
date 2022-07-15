@@ -15,6 +15,7 @@ import torch.optim as optim
 import device
 from torch.autograd import Variable
 from tqdm import tqdm
+import torch.optim.lr_scheduler as lr_scheduler
 
 def few_two_decide_v2(model, inputs): 
     model.linear.register_forward_hook(upgraded_net_hook.get_activation('linear'))
@@ -117,14 +118,18 @@ def few_two_decide_v2(model, inputs):
 ###   Train   ###
 #################
 def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
-    num_epochs=1
-    lr = 0.0002
+    num_epochs=30
+    lr = 0.002
     momentum = 0.9
     w_decay = 0.001
+    milestones= [1,2]
+    gamma = 0.1
+
     model = upgraded_net_hook.ResNet44().to(device.device)
     model.apply(upgraded_net_hook.weights_init_uniform)
     trainloader = dataloader.train_dataloader
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
+    #learningrate_scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=gamma)
     loss_func = nn.CrossEntropyLoss().to(device.device)
     if skip:
         model_point = torch.load("./utils/few2decide_model.tar", map_location=device.device)
@@ -139,7 +144,7 @@ def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, mo
             #for i, data in enumerate(trainloader):
             for input, label in tqdm(trainloader, total=len(trainloader), leave=False):
                 inputs, labels = Variable(input.to(device.device)), Variable(label.to(device.device))
-                pred = few_two_decide_v2(model, inputs)
+                #pred = few_two_decide_v2(model, inputs)
                 #print(pred)
                 pred = model(inputs)
                 #print(pred[0])
@@ -149,6 +154,7 @@ def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, mo
                 optimizer.step()
                 pred = pred.data.max(1, keepdim=True)[1]
                 #acc += accuracy_train(pred, labels)
+            #learningrate_scheduler.step()
         torch.save({"state_dict": model.state_dict()}, "./utils/few2decide_model.tar")
         #pred, labels = few_two_decide(model, trainloader)
         #print("Train-Acc: ", acc)
