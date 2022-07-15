@@ -36,17 +36,20 @@ def few_two_decide(model, dataloader):
     #print("---Hadamard product---")
     #values_mul = torch.mul(weight_matrix.T, avg_matrix) # 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
     
-    sum_tensor = torch.zeros(32, 10)
+    sum_tensor = torch.ones(32, 10)
     for i in range(len(avg_matrix)):
         values_mul = torch.mul(weight_matrix, avg_matrix[i])# 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
         #print(values_mul.size())
     
         #print("--sorted---")
-        values_sort, index = torch.sort(values_mul, dim=0) # 2. sort the connections calculation results of each neuron from min to max and get the V2
-
+        values_sort, index = torch.sort(values_mul, dim=1) # 2. sort the connections calculation results of each neuron from min to max and get the V2
+        #print(values_sort.round())
         print("---Clipping---")
-        min_quantile = torch.quantile(values_sort, 1/3).data.tolist()
-        max_quantile = torch.quantile(values_sort, 2/3).data.tolist()
+        
+        #ToDO - Clipping auf richtigkeit prüfen
+        
+        min_quantile = torch.quantile(values_sort, 1/3,dim=0).data.tolist
+        max_quantile = torch.quantile(values_sort, 2/3,dim=0).data.tolist
         #print(min_quantile)
         max = values_sort >= max_quantile
         min = values_sort <= min_quantile
@@ -54,10 +57,11 @@ def few_two_decide(model, dataloader):
         values_sort[max] = 0
         values_sort[min] = 0
         values_clip = values_sort #torch.clamp(values_sort,min=min_quantile, max=max_quantile, out=None) # In this step the nd Tensor should get the top and bottom 30 percent of the values set to zero
+        #print(values_clip.round())
 
-        
+        break
         #print("---Sum---")
-        values_sum = torch.sum(values_clip, dim=1) #Prediction Score
+        values_sum = torch.einsum('ij->i', [values_clip]) #torch.sum(values_clip, dim=1) #Prediction Score
         sum_tensor[i] = values_sum   
     return sum_tensor, labels
 
@@ -105,8 +109,8 @@ def train_few_two_decide(skip=False): #model, num_epochs, random_seed, lr, momen
 def accuracy_train(pred, labels):
     count = 0
     for i in range(len(labels)):
-        print(pred[i])
-        print(pred[i].argmax(), labels[i])
+        #print(pred[i])
+        #print(pred[i].argmax(), labels[i])
         if (pred[i].argmax() == labels[i]):
             count += 1
     acc = 100*(count/len(labels))        
@@ -123,7 +127,7 @@ def test_few_two_decide():
     correct = 0
     total = 0
     with torch.no_grad():
-        for data in dataloader.test_dataloader:
+        for i, data in enumerate(dataloader.test_dataloader):
             images, labels = data
             outputs = model(images)
             _, predicted = torch.max(outputs.data, 1)
@@ -136,7 +140,7 @@ def test_few_two_decide():
     return pred, label
 
 print ("Train:")
-pred, labels = train_few_two_decide(False)
+pred, labels = train_few_two_decide(True)
 #print(pred, labels)
 
 print("Test:")
