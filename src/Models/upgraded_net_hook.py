@@ -114,6 +114,11 @@ class ResNet(nn.Module):
         #print(out.size())
         return out
 
+def weights_init_uniform(m):
+    classname = m.__class__.__name__
+    if classname.find('Linear') != -1:
+        m.weight.data.uniform_(0.0, 1.0)
+
 def ResNet20():
     return ResNet(BasicBlock, [3, 3, 3])
 
