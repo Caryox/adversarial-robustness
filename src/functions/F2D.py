@@ -2,7 +2,6 @@ import sys
 from typing import final
 from unicodedata import decimal
 
-#import torchmetrics
 sys.path.append('./utils')
 sys.path.append('././src/Models')
 import attack_and_eval  
@@ -16,49 +15,43 @@ import torch.optim as optim
 import device
 from torch.autograd import Variable
 from tqdm import tqdm
-import torch.optim.lr_scheduler as lr_scheduler
+#import torch.optim.lr_scheduler as lr_scheduler
 
 def few_two_decide_v2(model, inputs): 
-    model.linear.register_forward_hook(upgraded_net_hook.get_activation('linear'))
+    model.linear.register_forward_hook(upgraded_net_hook.get_activation('linear')) 
     model.flatten.register_forward_hook(upgraded_net_hook.get_pooling('flatten'))
     pred = model(inputs)
 
     #print("Get matrix")
-    weight_matrix = upgraded_net_hook.activation['linear']
-    avg_matrix = upgraded_net_hook.average_pooling['flatten']
-    #avg_matrix = avg_matrix.mean(dim=(-2, -1))
+    weight_matrix = upgraded_net_hook.activation['linear']  # Weight-Matrix of the last FCL
+    avg_matrix = upgraded_net_hook.average_pooling['flatten'] # Flatten-Output from the Average-Pooling Layer
     
     #print(weight_matrix.size())
     #print(avg_matrix.size())
     
-    #print("---Hadamard product---")
-    #values_mul = torch.mul(weight_matrix.T, avg_matrix) # 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
-    
+    #print("---Hadamard product---")    
     sum_tensor = torch.ones(32, 10).to(device.device)
     for i in range(len(avg_matrix)):
         values_mul = torch.mul(weight_matrix, avg_matrix[i])# 1. Hadamard Multiplication Elementwise Multiplication of matrices (the shape should remain the same)
-        #print(values_mul.size())
-    
+        
         #print("--sorted---")
         values_sort, index = torch.sort(values_mul, dim=-1) # 2. sort the connections calculation results of each neuron from min to max and get the V2
-        #print(values_sort.size()) #.detach().numpy().round(2))
 
-        #print("---Clipping---")
-        #ToDO - Clipping auf richtigkeit prüfen
-        clip_tensor = torch.ones(10,64).to(device.device)
+        #print("---Clipping---")    
+        clip_tensor = torch.ones(10,64).to(device.device) 
         for j in range(len(values_sort)): 
             
-            min_quantile = torch.quantile(values_sort[j], 1/3).item()
-            max_quantile = torch.quantile(values_sort[j], 2/3).item()
+            min_quantile = torch.quantile(values_sort[j], 1/3).item() # lower bound
+            max_quantile = torch.quantile(values_sort[j], 2/3).item() # upper bound
             
             #print(min_quantile, max_quantile)
 
             value_clip = torch.where(values_sort[j] > min_quantile, values_sort[j], 0)
             value_clip =torch.where(value_clip < max_quantile, value_clip, 0)
-            clip_tensor[j] = value_clip
+            clip_tensor[j] = value_clip #3. Clipping the sorted neurons (set neurons = 0) 
+        
         #print("---Sum---")
         values_sum  = torch.sum(clip_tensor, dim=1) #Prediction Score
-        #print(values_sum)
 
         sum_tensor[i] = values_sum
     return sum_tensor
@@ -198,7 +191,6 @@ def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, mo
     return pred, labels"""
 
 # Train Accuaracy - F2D
-
 def accuracy_train(pred, labels):
     count = 0
     for i in range(len(labels)):
