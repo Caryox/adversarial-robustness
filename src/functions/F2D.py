@@ -119,11 +119,12 @@ def few_two_decide_v2(model, inputs):
 ###   Train   ###
 #################
 def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
-    num_epochs=30
+    print("Train F2D...")
+    num_epochs=100
     lr = 0.002
     momentum = 0.9
     w_decay = 0.001
-    milestones= [1,2]
+    milestones= [25,50,75]
     gamma = 0.1
 
     model = upgraded_net_hook.ResNet44().to(device.device)
@@ -212,6 +213,7 @@ def accuracy_train(pred, labels):
 ###    Test   ###
 #################
 def test_few_two_decide():
+    print("Testing F2D...")
     model = upgraded_net_hook.ResNet44().to(device.device)
     model_point = torch.load("./utils/few2decide_model.tar", map_location=device.device)
     model.load_state_dict(model_point["state_dict"])
@@ -283,13 +285,14 @@ def generate_adversarial_examples(model, data_loader, device, data_path, eps=0.1
 
 
 def test_attack(testloader, device, eps=0.15):
+    print("Testing attack...")
     test_loader = testloader
     model = upgraded_net_hook.ResNet44().to(device)
     model_point = torch.load("./utils/few2decide_model.tar", map_location=device)
     model.load_state_dict(model_point["state_dict"])
     model.eval()
     normal_acc, f2d_acc, adv_acc, normal_adv_acc,f2d_adv_acc, n = 0, 0, 0, 0, 0, 0
-    attack, fmodel = attack_and_eval.attack(model, "FGSM", (-255, 255))
+    attack, fmodel = attack_and_eval.attack(model, "L2DeepFool", (-255, 255))
     for input, label in tqdm(test_loader, total=len(test_loader), leave=False):
             input, label = Variable(input.to(device)), Variable(label.to(device))
 
@@ -312,16 +315,14 @@ def test_attack(testloader, device, eps=0.15):
 
 
     print(f'Resnet - Accuracy of the network on the normal test images: {100 * normal_acc // n} %')
-    print(f'F2D - Accuracy of the network on the 10000 test images: {100 * f2d_acc // n} %')
+    print(f'F2D - Accuracy of the network on the normal test images: {100 * f2d_acc // n} %')
     print(f'Resnet - Accuracy of the network on the adversarial test images: {100 * normal_adv_acc // n} %')
     print(f'F2D - Accuracy of the network on the adversarial test images: {100 * f2d_adv_acc // n} %')
 
-print ("Train:")
-#train_few_two_decide_v2(False)
-#print(pred, labels)
 
-print("Test:")
-#test_few_two_decide()
+train_few_two_decide_v2(False)
+
+test_few_two_decide()
 
 #generate_adversarial_examples(upgraded_net_hook.ResNet44().to(device.device), dataloader.test_dataloader, device.device, "./utils/adv_data.tar")
 
