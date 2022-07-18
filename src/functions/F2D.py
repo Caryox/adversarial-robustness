@@ -15,7 +15,7 @@ import torch.optim as optim
 import device
 from torch.autograd import Variable
 from tqdm import tqdm
-#import torch.optim.lr_scheduler as lr_scheduler
+import torch.optim.lr_scheduler as lr_scheduler
 
 def few_two_decide_v2(model, inputs): 
     model.linear.register_forward_hook(upgraded_net_hook.get_activation('linear')) 
@@ -113,18 +113,18 @@ def few_two_decide_v2(model, inputs):
 #################
 def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
     print("Train F2D...")
-    num_epochs=100
+    num_epochs=200
     lr = 0.002
     momentum = 0.9
     w_decay = 0.001
-    milestones= [25,50,75]
+    milestones= [25,50,75,100,125,150,175]
     gamma = 0.1
 
     model = upgraded_net_hook.ResNet44().to(device.device)
     model.apply(upgraded_net_hook.weights_init_uniform)
     trainloader = dataloader.train_dataloader
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
-    #learningrate_scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=gamma)
+    learningrate_scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=gamma)
     loss_func = nn.CrossEntropyLoss().to(device.device)
     if skip:
         model_point = torch.load("./utils/few2decide_model.tar", map_location=device.device)
@@ -149,7 +149,7 @@ def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, mo
                 optimizer.step()
                 pred = pred.data.max(1, keepdim=True)[1]
                 #acc += accuracy_train(pred, labels)
-            #learningrate_scheduler.step()
+            learningrate_scheduler.step()
         torch.save({"state_dict": model.state_dict()}, "./utils/few2decide_model.tar")
         #pred, labels = few_two_decide(model, trainloader)
         #print("Train-Acc: ", acc)
@@ -284,7 +284,7 @@ def test_attack(testloader, device, eps=0.15):
     model.load_state_dict(model_point["state_dict"])
     model.eval()
     normal_acc, f2d_acc, adv_acc, normal_adv_acc,f2d_adv_acc, n = 0, 0, 0, 0, 0, 0
-    attack, fmodel = attack_and_eval.attack(model, "L2DeepFool", (-255, 255))
+    attack, fmodel = attack_and_eval.attack(model, "FGSM", (-255, 255))
     for input, label in tqdm(test_loader, total=len(test_loader), leave=False):
             input, label = Variable(input.to(device)), Variable(label.to(device))
 
@@ -306,15 +306,15 @@ def test_attack(testloader, device, eps=0.15):
             f2d_adv_acc += (f2d_adv_pred == label).sum().item()
 
 
-    print(f'Resnet - Accuracy of the network on the normal test images: {100 * normal_acc // n} %')
-    print(f'F2D - Accuracy of the network on the normal test images: {100 * f2d_acc // n} %')
-    print(f'Resnet - Accuracy of the network on the adversarial test images: {100 * normal_adv_acc // n} %')
-    print(f'F2D - Accuracy of the network on the adversarial test images: {100 * f2d_adv_acc // n} %')
+    print(f'Resnet - Accuracy of the network on {n} normal test images with {normal_acc} correct predictions: {100 * normal_acc // n : .2f} %')
+    print(f'F2D - Accuracy of the network on {n} normal test images with {f2d_acc} correct predictions: {100 * f2d_acc // n : .2f} %')
+    print(f'Resnet - Accuracy of the network on {n} adversarial test images with {normal_adv_acc} correct predictions: {100 * normal_adv_acc // n : .2f} %')
+    print(f'F2D - Accuracy of the network on {n} adversarial test images with {f2d_adv_acc} correct predictions: {100 * f2d_adv_acc // n : .2f} %')
 
 
-train_few_two_decide_v2(False)
+#train_few_two_decide_v2(False)
 
-test_few_two_decide()
+#test_few_two_decide()
 
 #generate_adversarial_examples(upgraded_net_hook.ResNet44().to(device.device), dataloader.test_dataloader, device.device, "./utils/adv_data.tar")
 
