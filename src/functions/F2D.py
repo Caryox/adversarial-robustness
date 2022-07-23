@@ -2,6 +2,8 @@ import sys
 from typing import final
 from unicodedata import decimal
 
+from zmq import EVENT_LISTENING
+
 sys.path.append('./utils')
 sys.path.append('././src/Models')
 import attack_and_eval  
@@ -38,18 +40,23 @@ def few_two_decide_v2(model, inputs):
         values_sort, index = torch.sort(values_mul, dim=-1) # 2. sort the connections calculation results of each neuron from min to max and get the V2
 
         #print("---Clipping---")    
-        clip_tensor = torch.ones(10,64).to(device.device) 
+        clip_tensor = torch.ones(10,64).to(device.device)
         for j in range(len(values_sort)): 
             
+            for idx in range(len(values_sort[j].T)):
+                if idx <21 or idx > 42:
+                    values_sort[j][idx] = 0 
+                    
+            """print(values_sort)
             min_quantile = torch.quantile(values_sort[j], 1/3).item() # lower bound
             max_quantile = torch.quantile(values_sort[j], 2/3).item() # upper bound
             
             #print(min_quantile, max_quantile)
 
             value_clip = torch.where(values_sort[j] > min_quantile, values_sort[j], 0)
-            value_clip =torch.where(value_clip < max_quantile, value_clip, 0)
-            clip_tensor[j] = value_clip #3. Clipping the sorted neurons (set neurons = 0) 
-        
+            value_clip =torch.where(value_clip < max_quantile, value_clip, 0)"""
+            clip_tensor[j] = values_sort[j] #3. Clipping the sorted neurons (set neurons = 0) 
+            #print(clip_tensor[j])
         #print("---Sum---")
         values_sum  = torch.sum(clip_tensor, dim=1) #Prediction Score
 
@@ -113,7 +120,7 @@ def few_two_decide_v2(model, inputs):
 #################
 def train_few_two_decide_v2(skip=False): #model, num_epochs, random_seed, lr, momentum, train_loader, BATCH_SIZE, device ,skip = False):
     print("Train F2D...")
-    num_epochs=200
+    num_epochs=2
     lr = 0.002
     momentum = 0.9
     w_decay = 0.001
@@ -312,7 +319,7 @@ def test_attack(testloader, device, eps=0.15):
     print(f'F2D - Accuracy of the network on {n} adversarial test images with {f2d_adv_acc} correct predictions: {100 * f2d_adv_acc // n : .2f} %')
 
 
-#train_few_two_decide_v2(False)
+#train_few_two_decide_v2(True)
 
 #test_few_two_decide()
 
