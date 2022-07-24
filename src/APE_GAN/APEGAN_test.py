@@ -5,6 +5,7 @@ import dataloader
 import device
 import foolbox
 import upgraded_net
+import upgraded_net_hook
 import torch
 from torch.autograd import Variable
 from tqdm import tqdm
@@ -16,7 +17,8 @@ def APEGAN_Test(gan_path, model_path,  testloader, device, attack_name="FGSM", i
 
     model_point = torch.load(model_path)
     gan_point = torch.load(gan_path)
-    model = upgraded_net.simple_net_upgraded(input_channel, classes).to(device)
+    #model = upgraded_net.simple_net_upgraded(input_channel, classes).to(device)
+    model = upgraded_net_hook.ResNet44().to(device)
     model.load_state_dict(model_point["state_dict"])
 
     G = Generator(input_channel).to(device)
