@@ -46,17 +46,14 @@ def show_images(e, x, x_adv, x_fake, save_dir):
     plt.axis("off")
     plt.savefig(os.path.join(save_dir, "result_{}.png".format(e)))
 
-def APEGAN_Train(input_channel=1):
+def APEGAN_Train(input_channel, epochs, apegan_path):
     lr = 0.0002
-    num_epochs = 2
     batch_size = 128
     xi1, xi2 = 0.7, 0.3
     gen_epochs = 2
 
-    check_path = "./checkpoint/test"
-    os.makedirs(check_path, exist_ok=True)
 
-    train_data = torch.load("./src/APE-GAN/data.tar")
+    train_data = torch.load("./src/APE_GAN/data.tar")
     x_tmp = train_data["normal"][:5]
     input_adv_tmp = train_data["adv"][:5]
 
@@ -73,14 +70,15 @@ def APEGAN_Train(input_channel=1):
 
     print_str = "\t".join(["{}"] + ["{:.6f}"] * 2)
     print("\t".join(["{:}"] * 3).format("Epoch", "Gen_Loss", "Dis_Loss"))
-    for epoch in range(num_epochs):
-        G.eval()
-        input_fake = G(Variable(input_adv_tmp.to(device))).data
-        show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
+    for epoch in range(epochs):
+        #G.eval()
+        #input_fake = G(Variable(input_adv_tmp.to(device))).data
+        #show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
         G.train()
         gen_loss, dis_loss, n = 0, 0, 0
-        for i, data in enumerate(train_loader,0):
-            input, input_adv = data
+        #for i, data in enumerate(train_loader,0):
+        for input, input_adv in tqdm(train_loader, total=len(train_loader), leave=False):
+            #input, input_adv = data
             current_size = input.size(0)
             input, input_adv = Variable(input.to(device)), Variable(input_adv.to(device))
             # Train D
@@ -110,10 +108,9 @@ def APEGAN_Train(input_channel=1):
             dis_loss += loss_G.item() * input.size(0)
             n += input.size(0)
         print(print_str.format(epoch, gen_loss / n, dis_loss / n))
-        torch.save({"generator": G.state_dict(), "discriminator": D.state_dict()},
-                   os.path.join(check_path, "{}.tar".format(epoch + 1)))
+    torch.save({"generator": G.state_dict(), "discriminator": D.state_dict()}, apegan_path)
 
-    G.eval()
-    input_fake = G(Variable(input_adv_tmp.to(device))).data
-    show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
-    G.train()
+    #G.eval()
+    #input_fake = G(Variable(input_adv_tmp.to(device))).data
+    #show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
+    #G.train()

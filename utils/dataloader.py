@@ -82,28 +82,33 @@ train_dataset_MNIST = torchvision.datasets.MNIST('./data', train=True, download=
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
-                                            transforms.Normalize(*param.NORM),]))
+                                            #transforms.Normalize(*param.NORM),
+                                            ]
+                                            ))
                                 
 test_dataset_MNIST = datasets.MNIST(root='./data', train=False, download=True, 
                                     transform = transforms.Compose([
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
-                                            transforms.Normalize(*param.NORM),]))
+                                            #transforms.Normalize(*param.NORM),
+                                            ]))
 
 train_dataset_CIFAR10 = torchvision.datasets.CIFAR10('./data', train=True, download=True,
                                 transform = transforms.Compose([
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
-                                            transforms.Normalize(*param.NORM),]))
+                                            #transforms.Normalize(*param.NORM),
+                                            ]))
 
 test_dataset_CIFAR10 = datasets.CIFAR10(root='./data', train=False, download=True, 
                                     transform = transforms.Compose([
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
-                                            transforms.Normalize(*param.NORM),]))
+                                            #transforms.Normalize(*param.NORM),
+                                            ]))
 #Concat Train and Test Dataset --> Whole Data 
 dataset_MNIST = ConcatDataset([train_dataset_MNIST, test_dataset_MNIST])
 dataset_CIFAR10 = ConcatDataset([train_dataset_CIFAR10, test_dataset_CIFAR10])
