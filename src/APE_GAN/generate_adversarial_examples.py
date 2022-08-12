@@ -17,38 +17,16 @@ from torch.autograd import Variable
 from tqdm import tqdm
 
 
-def gen_adv(trainloader, device, model, resnet_path, epochs, eps):
-    lr = 0.0002
-    momentum = 0.9
-    w_decay = 0.001
-    milestones= [50,75]
-    gamma = 0.1
+def gen_adv(trainloader, device, model, resnet_path, eps, input_channel):
     model = model
-    model.apply(upgraded_net_hook.weights_init_uniform)
-    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
-    learningrate_scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=gamma) # calc new learning rate
-    loss_func = nn.CrossEntropyLoss().to(device)
-    
-    print("Training model for adversarial examples...")
-    for epoch in range(epochs):
-        print("Epoch: ", epoch + 1)
-        model.train()
-        
-        for input, label in tqdm(trainloader, total=len(trainloader), leave=False):
-            input, label = Variable(input.to(device)), Variable(label.to(device))
-            
-            pred = model(input)
-            loss = loss_func(pred, label)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-        learningrate_scheduler.step()
-        
-        
-    #Generate Adv. Examples
+    model_point = torch.load(resnet_path)
+    model.load_state_dict(model_point["state_dict"])
     normal_data, adv_data = None, None
     model.eval()
-    attack, fmodel = attack_and_eval.attack(model, "FGSM")
+    if(input_channel == 1):
+        attack, fmodel = attack_and_eval.attack(model, "FGSM", (0, 1))
+    else:
+        attack, fmodel = attack_and_eval.attack(model, "FGSM", (0, 255)) 
     print("Generating adversarial examples...")
     for input, label in tqdm(trainloader, total=len(trainloader), leave=False):
         input, label = Variable(input.to(device)), Variable(label.to(device))
@@ -61,4 +39,3 @@ def gen_adv(trainloader, device, model, resnet_path, epochs, eps):
             adv_data = torch.cat((adv_data, raw_adv_input))
 
     torch.save({"normal": normal_data, "adv": adv_data}, "./src/APE_GAN/data.tar")
-    torch.save({"state_dict": model.state_dict()}, resnet_path)

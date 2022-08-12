@@ -10,6 +10,8 @@ def attack(model, attack, bounds=(-1, 1)):
         attack = foolbox.attacks.FGSM()
     elif(attack == "L2DeepFool"):
         attack = foolbox.attacks.L2DeepFoolAttack()
+    elif(attack == "LinfDeepFool"):
+        attack = foolbox.attacks.LinfDeepFoolAttack()
     elif(attack == "C&W"):
         attack = foolbox.attacks.L2CarliniWagnerAttack()
     elif(attack == "PGD"):

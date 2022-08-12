@@ -42,7 +42,7 @@ def few_two_decide_v2(model, inputs):
         for j in range(len(values_sort)): 
             
             for idx in range(len(values_sort[j].T)):
-                if idx <21 or idx > 42:
+                if idx <32 or idx > 53:
                     values_sort[j][idx] = 0 
                     
             clip_tensor[j] = values_sort[j] #3. Clipping the sorted neurons (set neurons = 0) 
@@ -55,7 +55,7 @@ def few_two_decide_v2(model, inputs):
 
 
 def test_attack(testloader, device,model, attack, resnet_path, apegan_path, input_channel, eps):
-    print("Testing attack...")
+    print("Testing " + attack + " for epsilon " + str(eps))
     test_loader = testloader
     model = model
     model_point = torch.load(resnet_path, map_location=device)
@@ -79,9 +79,9 @@ def test_attack(testloader, device,model, attack, resnet_path, apegan_path, inpu
             apegan_normal_pred = model(apegan_normal_inputs)
             apegan_f2d_normal_pred = few_two_decide_v2(model, apegan_normal_inputs)
             input_adv, input_2, success = attack(fmodel, input, label, epsilons=eps)
-            normal_adv_pred = model(input_adv)
-            f2d_adv_pred = few_two_decide_v2(model, input_adv)
-            apegan_inputs = G(input_adv)
+            normal_adv_pred = model(input_2)
+            f2d_adv_pred = few_two_decide_v2(model, input_2)
+            apegan_inputs = G(input_2)
             apegan_adv_pred = model(apegan_inputs)
             apegan_f2d_adv_pred = few_two_decide_v2(model, apegan_inputs)
 

@@ -76,9 +76,9 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
         #show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
         G.train()
         gen_loss, dis_loss, n = 0, 0, 0
-        #for i, data in enumerate(train_loader,0):
-        for input, input_adv in tqdm(train_loader, total=len(train_loader), leave=False):
-            #input, input_adv = data
+        for i, data in enumerate(train_loader,0):
+        #for input, input_adv in tqdm(train_loader, total=len(train_loader), leave=False):
+            input, input_adv = data
             current_size = input.size(0)
             input, input_adv = Variable(input.to(device)), Variable(input_adv.to(device))
             # Train D
@@ -108,9 +108,10 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
             dis_loss += loss_G.item() * input.size(0)
             n += input.size(0)
         print(print_str.format(epoch, gen_loss / n, dis_loss / n))
+        G.eval()
+        input_fake = G(Variable(input_adv_tmp.to(device))).data
+        show_images(epoch, x_tmp, input_adv_tmp, input_fake, "./src/APE_GAN/Images/")
+        G.train()
     torch.save({"generator": G.state_dict(), "discriminator": D.state_dict()}, apegan_path)
 
-    #G.eval()
-    #input_fake = G(Variable(input_adv_tmp.to(device))).data
-    #show_images(epoch, x_tmp, input_adv_tmp, input_fake, check_path)
-    #G.train()
+    
