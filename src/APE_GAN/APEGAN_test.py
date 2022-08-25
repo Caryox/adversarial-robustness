@@ -12,13 +12,13 @@ from tqdm import tqdm
 from APEGANModels import Generator
 import attack_and_eval
 
-def APEGAN_Test(gan_path, model_path,  testloader, device, attack_name="FGSM", input_channel=1, classes=10, eps=0.15):
+def APEGAN_Test(gan_path, model_path,  testloader, device, model, attack_name, input_channel, classes=10, eps=0.15):
     test_loader = testloader
 
     model_point = torch.load(model_path)
     gan_point = torch.load(gan_path)
     #model = upgraded_net.simple_net_upgraded(input_channel, classes).to(device)
-    model = upgraded_net_hook.ResNet44().to(device)
+    model = model
     model.load_state_dict(model_point["state_dict"])
 
     G = Generator(input_channel).to(device)
