@@ -51,7 +51,7 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         shuffle=False,
         drop_last=True,
         worker_init_fn=random_seed,
-        num_workers=num_of_worker,
+        num_workers=0,
         #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
@@ -82,36 +82,40 @@ train_dataset_MNIST = torchvision.datasets.MNIST('./data', train=True, download=
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
-                                            transforms.Normalize(*param.NORM),]))
-
-''''
-Plot Images 
-
-figure = plt.figure(figsize=(10, 8))
-cols, rows = 5, 5
-for i in range(1, cols * rows + 1):
-    sample_idx = torch.randint(len(train_dataset_MNIST), size=(1,)).item()
-    img, label = train_dataset_MNIST[sample_idx]
-    figure.add_subplot(rows, cols, i)
-    plt.title(label)
-    plt.axis("off")
-    plt.imshow(img.squeeze(), cmap="gray")
-plt.show()
-'''                                     
+                                            #transforms.Normalize(*param.NORM),
+                                            ]
+                                            ))
+                                
 test_dataset_MNIST = datasets.MNIST(root='./data', train=False, download=True, 
                                     transform = transforms.Compose([
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
-                                            transforms.Normalize(*param.NORM),]))
+                                            #transforms.Normalize(*param.NORM),
+                                            ]))
 
+train_dataset_CIFAR10 = torchvision.datasets.CIFAR10('./data', train=True, download=True,
+                                transform = transforms.Compose([
+                                            transforms.Resize(param.IMAGE_SIZE),
+                                            transforms.CenterCrop(param.IMAGE_SIZE),
+                                            transforms.ToTensor(),
+                                            #transforms.Normalize(*param.NORM),
+                                            ]))
 
+test_dataset_CIFAR10 = datasets.CIFAR10(root='./data', train=False, download=True, 
+                                    transform = transforms.Compose([
+                                            transforms.Resize(param.IMAGE_SIZE),
+                                            transforms.CenterCrop(param.IMAGE_SIZE),
+                                            transforms.ToTensor(),
+                                            #transforms.Normalize(*param.NORM),
+                                            ]))
 #Concat Train and Test Dataset --> Whole Data 
 dataset_MNIST = ConcatDataset([train_dataset_MNIST, test_dataset_MNIST])
+dataset_CIFAR10 = ConcatDataset([train_dataset_CIFAR10, test_dataset_CIFAR10])
 
 #Custom Train, Validation, Test Split
 train_dataloader, validation_dataloader, test_dataloader = dataloader(dataset_MNIST, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG, param.num_of_worker)
-
+train_dataloader_CIFAR10, validation_dataloader_CIFAR10, test_dataloader_CIFAR10 = dataloader(dataset_CIFAR10, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG, param.num_of_worker)
 
 '''-----Erweiterung-----'''
 

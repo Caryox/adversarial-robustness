@@ -9,7 +9,7 @@ BATCH_SIZE = 32
 IMAGE_SIZE = 28
 learning_rate = 0.01
 momentum = 0.5
-NORM = (0.5,), (0.5,)
+NORM = (0.1307,), (0.3081,)
 count = 0
 loss_list = []
 iteration_list = []
@@ -21,7 +21,8 @@ random_seed = 1337
 
 # Train, Validation, Test
 TEST_SPLIT = 0.2
-VALID_SPLIT = 0
+#TEST_SPLIT = 0.00166666666666666666666666666667 # Test for C&W
+VALID_SPLIT = 0.1
 TRAIN_SPLIT = (1-(TEST_SPLIT+VALID_SPLIT))
 
 SPLIT_AUFTEILUNG = {TRAIN_SPLIT, VALID_SPLIT, TEST_SPLIT}
