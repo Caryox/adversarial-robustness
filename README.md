@@ -1,7 +1,6 @@
 # Evaluation of the Effectiveness using Ensemble Adversarial Training in Combination with Conventional Input Rectification and APE-GAN Architecture in Combination with Few2Decide against Adversarial Perturbation Attacks​
 
-This repository contains all code modules for the paper with the same name.
-Read the paper here
+This repo contains our code moduls and data for our paper with the same name. 
 
 ## Abstract
 
@@ -9,19 +8,18 @@ Image classification is applied in many applications nowadays; thus, its algorit
 
 ## Table of content
 
+### Data
+- [MNIST](https://github.com/Caryox/adversial-robustness/tree/main/data/MNIST) 
+- [CIFAR-10](https://github.com/Caryox/adversial-robustness/tree/main/data/cifar-10-batches-py)
 
+### Main Modules
+- [APE-GAN](https://github.com/Caryox/adversial-robustness/tree/main/src/APE_GAN)
+- [Ensemble Models](https://github.com/Caryox/adversial-robustness/tree/main/src/Models) 
 
+### Example Images
+Our ensemble modul
+![Ensemble](https://github.com/Caryox/adversial-robustness/blob/fc70b735438bafb5d275c1ca33cc52e5209739bc/data/Ensemble%20Conventional%20Rectification%20V4_Updated.jpg)
+Image processing
+![Image processing](https://github.com/Caryox/adversial-robustness/blob/fc70b735438bafb5d275c1ca33cc52e5209739bc/data/example_image_processing.jpg)
 
-
-
-### Linux and Mac Users
-
-- run the setup script `./setup.sh` or `sh setup.sh`
-
-### Windows Users
-
-- run the setup script `.\setup.ps1`
-
-## Pictures of our experiments
-Image smoothing examples 
 
