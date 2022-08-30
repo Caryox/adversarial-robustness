@@ -89,53 +89,53 @@ def core_main():
         if user_input == 1:
             if str(dataset_name) == "MNIST":
                 network.load_state_dict(torch.load(
-                   '../../src/results/model_integrated_ens.pth'))
+                   '../src/results/model_integrated_ens.pth'))
                 print('Loaded normal trained MNIST weights from file')
                 optimizer.load_state_dict(torch.load(
-                    '../../src/results/optimizer_integrated.pth'))
+                    '../src/results/optimizer_integrated.pth'))
                 print('Loaded normal trained MNIST optimizer from file')
             elif str(dataset_name) == "CIFAR":
                 network.load_state_dict(torch.load(
-                    '../../src/results/model_integrated_ens_cifar.pth'))
+                    '../src/results/model_integrated_ens_cifar.pth'))
                 print('Loaded normal trained CIFAR-10 weights from file')
                 optimizer.load_state_dict(torch.load(
-                    '../../src/results/optimizer_integrated_cifar.pth'))
+                    '../src/results/optimizer_integrated_cifar.pth'))
                 print('Loaded normal trained CIFAR-10 optimizer from file')
     ###PGD+normal###
     if user_input == 2:
         if str(dataset_name) == "MNIST":
             # ../src/results/model_integrated_ens_adv_mnist_03.pth
             network.load_state_dict(torch.load(
-                '../../src/results/model_integrated_ens_adv.pth'))
+                '../src/results/model_integrated_ens_adv.pth'))
             print('Loaded PGD+normal trained MNIST weights from file')
             # ../src/results/optimizer_integrated_adv_mnist_03.pth
             optimizer.load_state_dict(torch.load(
-                '../../src/results/optimizer_integrated_adv.pth'))
+                '../src/results/optimizer_integrated_adv.pth'))
             print('Loaded PGD+normal trained MNIST optimizer from file')
         elif str(dataset_name) == "CIFAR":
             network.load_state_dict(torch.load(
-                '../../src/results/model_integrated_ens_adv_cifar.pth'))
+                '../src/results/model_integrated_ens_adv_cifar.pth'))
             print('Loaded PGD+normal trained CIFAR-10 weights from file')
             optimizer.load_state_dict(torch.load(
-                '../../src/results/optimizer_integrated_adv_cifar.pth'))
+                '../src/results/optimizer_integrated_adv_cifar.pth'))
             print('Loaded PGD+normal trained CIFAR-10 optimizer from file')
     ###PGD#FGSM###
     if user_input == 3:
         if str(dataset_name) == "MNIST":
             # ../src/results/model_integrated_ens_adv_mnist_03.pth
             network.load_state_dict(torch.load(
-                '../../src/results/model_integrated_ens_adv_mnist_03.pth'))
+                '../src/results/model_integrated_ens_adv_mnist_03.pth'))
             print('Loaded PGD+FGSM trained MNIST weights from file')
             # ../src/results/optimizer_integrated_adv_mnist_03.pth
             optimizer.load_state_dict(torch.load(
-                '../../src/results/optimizer_integrated_adv_mnist_03.pth'))
+                '../src/results/optimizer_integrated_adv_mnist_03.pth'))
             print('Loaded PGD+FGSM trained MNIST optimizer from file')
         elif str(dataset_name) == "CIFAR":
             network.load_state_dict(torch.load(
-                '../../src/results/model_integrated_ens_adv_cifar_03.pth'))
+                '../src/results/model_integrated_ens_adv_cifar_03.pth'))
             print('Loaded PGD+FGSM trained CIFAR-10 weights from file')
             optimizer.load_state_dict(torch.load(
-                '../../src/results/optimizer_integrated_adv_cifar_03.pth'))
+                '../src/results/optimizer_integrated_adv_cifar_03.pth'))
             print('Loaded PGD+FGSM trained CIFAR-10 optimizer from file')
 
     print("Loaded/Trained Model succeessfully!")
