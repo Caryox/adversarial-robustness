@@ -16,7 +16,6 @@ def evaluate_adversarial_detection(dataset,labelset,network,dataset_name,t=0.01,
         if (dataset_name == "MNIST"):
             data = data.unsqueeze(dim=1)
         if (dataset_name == "CIFAR"):
-            print(data.shape)
             data = data.reshape(1, 3, 28, 28)
         with torch.no_grad():
             output = network(data)

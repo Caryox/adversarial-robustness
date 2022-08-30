@@ -1,11 +1,11 @@
-def train(network,optimizer,train_loader,dataset_name,epochs,double_adv=False,use_ensemble=0,adversial_train=0):
+def train(network,optimizer,train_loader,dataset_name,epochs,adversarial_train=False,double_adv=False):
   import foolbox as fb
   import torch.nn.functional as F
   import torch.optim as optim
   network.train()
   train_losses = []
   train_counter = []
-  if (adversial_train):
+  if (adversarial_train):
     if (double_adv):
       epsilons = [0.3]
       print ("Using FGSM+PGD alterating adversarial train")
@@ -23,7 +23,7 @@ def train(network,optimizer,train_loader,dataset_name,epochs,double_adv=False,us
     epoch+=1
     for batch_idx, (data, target) in enumerate(train_loader):
       optimizer.zero_grad()
-      if (adversial_train):
+      if (adversarial_train):
         if (double_adv):
           if (str(dataset_name)=="CIFAR"):
             if (epoch%2==0):
