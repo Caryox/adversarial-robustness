@@ -150,12 +150,11 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
     acc = 100. * correct / len(loader.dataset)
     test_acc.append(acc)
     
-    print('\nTest set: Avg. loss baseline: {:.4f}, Accuracy: {}/{} ({:.0f}%), Accuracy_Median_Smooth: {}, Accuracy_Bit_Reduction: {}, Accuracy_Jury_Ensemble: {}, Accuracy_Pooled_Ensemble: {}, Threshold t Baseline: {}, False Positives Baseline: {}, True Negatives Baseline: {}, Pertubated Samples Detected: {}, Pertubated Samples Real: {}\n'.format(
+    print('\nTest set: Avg. loss baseline: {:.4f}, Accuracy: {}/{} ({:.0f}%), Accuracy_Median_Smooth: {}, Accuracy_Bit_Reduction: {}, Accuracy_Jury_Ensemble: {}, Accuracy_Pooled_Ensemble: {}\n'.format(
     test_loss, acc, len(loader.dataset),
-    100. * correct / len(loader.dataset), 100. * correct_ms / len(loader.dataset), 100. * correct_br / len(loader.dataset), 100. * correct_ensemble / len(loader.dataset),100. * correct_pool / len(loader.dataset),baseline_threshold,false_positives,true_negatives, pertubated_detected, pertubated))
+    100. * correct / len(loader.dataset), 100. * correct_ms / len(loader.dataset), 100. * correct_br / len(loader.dataset), 100. * correct_ensemble / len(loader.dataset),100. * correct_pool / len(loader.dataset)))
     print('Attack Success (Pooled): {}'.format((100-(100/base_accuracy)-acc)/100))
-    if (is_attack):
-        print('\nDetection Accuracy {}%'.format((100/pertubated)*pertubated_detected))
+
     print('L0 Distance: {}'.format(distance_l0/runs))
     print('L2 Distance: {}'.format(distance_l2/runs))
     print('Linf Distance: {}'.format(distance_linf/runs))
