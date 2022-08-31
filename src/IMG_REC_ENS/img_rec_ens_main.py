@@ -275,6 +275,7 @@ def core_main():
     t_value = calculate_threshold_t(
         differences, adversarial_map, correction_t=1.0, print_output=True)
     #Evaluate detection accuracy using estimated threshold t and test dataset
+    print("#####TEST RESULTS#####")
     evaluate_adversarial_detection(data_test, label_test, network, str(
         dataset_name), t_value, evaluate=True)
     print("###################################")
