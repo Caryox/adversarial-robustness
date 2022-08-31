@@ -23,7 +23,6 @@ Image processing
 ![Image processing](https://github.com/Caryox/adversial-robustness/blob/fc70b735438bafb5d275c1ca33cc52e5209739bc/data/example_image_processing.jpg)
 
 Adversarial Detection
-![grafik](https://user-images.githubusercontent.com/56730144/187690798-a2a8d4ae-038a-471a-aae5-a08800a4b273.png)
-
+![grafik](https://user-images.githubusercontent.com/56730144/187691315-aea67a9a-a745-4a40-bc92-5d006822a81b.png)
 Try to calculate best threshold t for seperate adversarials and legitimate samples by measuring the maximum L1-Distance of the SoftMax-Layer between the baseline CNN ensemble and the feature squeezed CNN ensembles
 
