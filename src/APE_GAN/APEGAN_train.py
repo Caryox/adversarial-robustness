@@ -1,33 +1,24 @@
+# APE-GAN train class
+
+# Import custom Module
 import sys
 sys.path.append('./.')
 from utils.device import device
-
-
-import torch as torch 
-import torch.nn as nn
-import torch.optim as optim
-
-
 from APEGANModels import Generator, Discriminator
-
-
 
 # -*- coding: utf-8 -*-
 
 import os
-
-
-import torch
+import torch as torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import TensorDataset
 
-
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-
+# function - show images
 def show_images(e, x, x_adv, x_fake, save_dir):
     fig, axes = plt.subplots(3, 5, figsize=(10, 6))
     for i in range(5):
@@ -60,11 +51,14 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
     train_data = TensorDataset(train_data["normal"], train_data["adv"])
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
-    G = Generator(input_channel).to(device)
-    D = Discriminator(input_channel).to(device)
+    G = Generator(input_channel).to(device) # Generator Output
+    D = Discriminator(input_channel).to(device) # Discriminator Output
 
+    #optimizer for Generator and Discriminator
     opt_G = optim.Adam(G.parameters(), lr=lr, betas=(0.5, 0.999))
     opt_D = optim.Adam(D.parameters(), lr=lr, betas=(0.5, 0.999))
+    
+    # loss functions
     loss_bce = nn.BCELoss()
     loss_mse = nn.MSELoss()
 
@@ -103,7 +97,8 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
                 opt_G.zero_grad()
                 loss_G.backward()
                 opt_G.step()
-
+            
+            # Calc losses
             gen_loss += loss_D.item() * input.size(0)
             dis_loss += loss_G.item() * input.size(0)
             n += input.size(0)
