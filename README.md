@@ -37,10 +37,7 @@ pip install -r requirements.txt
 ```
 
 After your environment it setup, run the main.py file to start the experiment. 
-
-```
-pip install 
-####  
+ 
 ### Example Images
 Conventional Image Rectification Framework using Ensemble CNN
 ![Ensemble](https://github.com/Caryox/adversial-robustness/blob/fc70b735438bafb5d275c1ca33cc52e5209739bc/data/Ensemble%20Conventional%20Rectification%20V4_Updated.jpg)
