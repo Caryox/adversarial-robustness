@@ -28,11 +28,12 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         print(r)
     lengths[2] += r
     
-    
+    #Calculation of the dataset-sizes
     train = torch.utils.data.Subset(dataset, range(0, lengths[0]))
     validation = torch.utils.data.Subset(dataset, range(lengths[0], lengths[0] + lengths[1]))
     test = torch.utils.data.Subset(dataset, range(lengths[0] + lengths[1], lengths[0] + lengths[1] + lengths[2]))
     
+    # train loader
     train_dataloader = torch.utils.data.DataLoader(
         train,
         batch_size=BATCH_SIZE,
@@ -44,7 +45,8 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         persistent_workers=False,
         pin_memory=True
     )
-
+    
+    # validation loader
     validation_dataloader = torch.utils.data.DataLoader(
         validation,
         batch_size=BATCH_SIZE,
@@ -57,6 +59,7 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         pin_memory=True
     )
 
+    # test loader
     test_dataloader = torch.utils.data.DataLoader(
         test,
         batch_size=BATCH_SIZE,
@@ -68,6 +71,8 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         persistent_workers=False,
         pin_memory=True
     )
+    
+    # 
     if display_informations:
         print(f'Total dataset: {len(train_dataloader) + len(validation_dataloader) + len(test_dataloader)}, '
             f'train dataset: {len(train_dataloader)}, val dataset: {len(validation_dataloader)}, test_dataset: {len(test_dataloader)}')
@@ -82,6 +87,7 @@ train_dataset_MNIST = torchvision.datasets.MNIST('./data', train=True, download=
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
+                                            #transforms.Normalize(*param.NORM),
                                             ]
                                             ))
                                 
@@ -90,13 +96,16 @@ test_dataset_MNIST = datasets.MNIST(root='./data', train=False, download=True,
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
+                                            #transforms.Normalize(*param.NORM),
                                             ]))
 
+#CIFAR-10
 train_dataset_CIFAR10 = torchvision.datasets.CIFAR10('./data', train=True, download=True,
                                 transform = transforms.Compose([
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
+                                            #transforms.Normalize(*param.NORM),
                                             ]))
 
 test_dataset_CIFAR10 = datasets.CIFAR10(root='./data', train=False, download=True, 
@@ -104,19 +113,20 @@ test_dataset_CIFAR10 = datasets.CIFAR10(root='./data', train=False, download=Tru
                                             transforms.Resize(param.IMAGE_SIZE),
                                             transforms.CenterCrop(param.IMAGE_SIZE),
                                             transforms.ToTensor(),
-
+                                            #transforms.Normalize(*param.NORM),
                                             ]))
 #Concat Train and Test Dataset --> Whole Data 
+'''MNIST'''
 dataset_MNIST = ConcatDataset([train_dataset_MNIST, test_dataset_MNIST])
+
+'''CIFAR-10'''
 dataset_CIFAR10 = ConcatDataset([train_dataset_CIFAR10, test_dataset_CIFAR10])
 
 #Custom Train, Validation, Test Split
+
+'''MNIST'''
 train_dataloader, validation_dataloader, test_dataloader = dataloader(dataset_MNIST, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG, param.num_of_worker)
+
+'''CIFAR-10'''
 train_dataloader_CIFAR10, validation_dataloader_CIFAR10, test_dataloader_CIFAR10 = dataloader(dataset_CIFAR10, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG, param.num_of_worker)
 
-'''-----Erweiterung-----'''
-
-# CIFAR10
-
-#datasetCIFAR = datasets.CIFAR10(root='./data', train=True, download=True, transform=None)
-#dataloaderCIFAR = dataloader(datasetCIFAR, param.BATCH_SIZE, param.SPLIT_AUFTEILUNG)
