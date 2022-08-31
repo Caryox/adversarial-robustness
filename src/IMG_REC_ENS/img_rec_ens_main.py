@@ -43,7 +43,6 @@ def core_main():
 
     print("1. Use MNIST dataset")
     print("2. Use CIFAR-10 dataset")
-    print("3. Return to defense selecion")
     user_input = int(input("Selection: "))
 
     #Match-support comes with python 3.10
