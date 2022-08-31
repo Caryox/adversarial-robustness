@@ -18,7 +18,7 @@ def cls():
 #Project main
 def project_main ():
     print("##########")
-    print("Evaluation of the Effectiveness using Ensemble Adversarial Training in Combination with Conventional Input Rectification and APE-GAN Architecture in Combination with Few2Decide against Adversarial Perturbation Attacks​")
+    print("Evaluation of the effectiveness using Ensemble Adversarial Training in combination with Conventional Input Rectification and APE-GAN Architecture in combination with Few2Decide against adversarial perturbation attacks​")
     print("##########")
     print("\n")
     print("1. APE-GAN Architecture in combination with Few2Decide")
