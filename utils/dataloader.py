@@ -7,16 +7,13 @@ import torchvision
 import torchvision.datasets as datasets
 from torch.utils.data import ConcatDataset
 import torchvision.transforms as transforms
-#import matplotlib.pyplot as plt
-
 
 # CustomPackages
 import param
 
-def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False, num_of_worker=param.num_of_worker, random_seed=1337):
+def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False, num_of_worker=param.num_of_worker, random_seed=param.random_seed):
     torch.backends.cudnn.enabled = True
     torch.manual_seed(random_seed)
-    
     lengths = [round(len(dataset) * split) for split in split_aufteilung] # calculate lengths per dataset without consideration Split_Aufteilung
 
     r = 0
@@ -41,7 +38,6 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         drop_last=True,
         worker_init_fn=random_seed,
         num_workers=0, #num_Worker = 0 because MemoryError 
-        #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
     )
@@ -54,7 +50,6 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         drop_last=True,
         worker_init_fn=random_seed,
         num_workers=0,
-        #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
     )
@@ -67,12 +62,11 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
         drop_last=True,
         worker_init_fn=random_seed,
         num_workers=0,
-        #prefetch_factor=1,
         persistent_workers=False,
         pin_memory=True
     )
     
-    # 
+    # show length of the train, validation and testloader
     if display_informations:
         print(f'Total dataset: {len(train_dataloader) + len(validation_dataloader) + len(test_dataloader)}, '
             f'train dataset: {len(train_dataloader)}, val dataset: {len(validation_dataloader)}, test_dataset: {len(test_dataloader)}')
@@ -81,7 +75,6 @@ def dataloader(dataset, BATCH_SIZE, split_aufteilung, display_informations=False
 
 
 #MNIST
-    
 train_dataset_MNIST = torchvision.datasets.MNIST('./data', train=True, download=True,
                              transform = transforms.Compose([
                                             transforms.Resize(param.IMAGE_SIZE),
