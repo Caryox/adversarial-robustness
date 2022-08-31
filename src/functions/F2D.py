@@ -27,7 +27,7 @@ def few_two_decide_v2(model, inputs):
 
     avg_matrix = upgraded_net_hook.average_pooling['flatten'] # Flatten-Output from the Average-Pooling Layer
     # Get linear.weights 
-    weights = model.linear.weight.data.clone().detach().requires_grad_(True)
+    weights = model.linear.weight.data.clone().detach().requires_grad_(True) #get weight matrix from ResNet
     
     #("---Hadamard product---")    
     sum_tensor = torch.ones(32, 10).to(device.device)
@@ -85,6 +85,7 @@ def test_attack(testloader, device,model, attack, resnet_path, apegan_path, inpu
             apegan_adv_pred = model(apegan_inputs)
             apegan_f2d_adv_pred = few_two_decide_v2(model, apegan_inputs)
 
+            # Prediction - model combination
             _, normal_pred = torch.max(normal_pred.data, 1)
             __, f2d_pred_index = torch.max(f2d_pred.data, 1)
             __, apegan_normal_pred = torch.max(apegan_normal_pred.data, 1)
@@ -94,6 +95,7 @@ def test_attack(testloader, device,model, attack, resnet_path, apegan_path, inpu
             __, apegan_adv_pred = torch.max(apegan_adv_pred.data, 1)
             _, apegan_f2d_adv_pred = torch.max(apegan_f2d_adv_pred.data, 1)
 
+            # Accuarcys - model combinations
             n += label.size(0)
             normal_acc += (normal_pred == label).sum().item()
             f2d_acc += (f2d_pred_index == label).sum().item()

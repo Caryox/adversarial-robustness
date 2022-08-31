@@ -1,3 +1,4 @@
+# APEGAN - test class
 import sys
 sys.path.append('./utils')
 sys.path.append('./src/Models')
@@ -27,6 +28,7 @@ def APEGAN_Test(gan_path, model_path,  testloader, device, model, attack_name, i
     attack, fmodel = attack_and_eval.attack(model, attack_name)
     
     normal_acc, adv_acc, ape_acc, n = 0, 0, 0, 0
+    # Test model
     print("Start testing...")
     for input, label in tqdm(test_loader, total=len(test_loader), leave=False):
         input, label = Variable(input.to(device)), Variable(label.to(device))

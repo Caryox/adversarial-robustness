@@ -21,7 +21,7 @@ def resnet_train(trainloader, device, model, resnet_path, epochs):
     lr = 0.01
     momentum = 0.9
     w_decay = 0.001
-    milestones= [50,75]
+    milestones= [50,75] # after 50 and 75 epochs the learning rate is recalculated
     gamma = 0.1
     model = model
     model.apply(upgraded_net_hook.weights_init_uniform) #Use uniform initialization

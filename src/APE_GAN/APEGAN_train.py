@@ -43,7 +43,7 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
     xi1, xi2 = 0.7, 0.3
     gen_epochs = 2
 
-
+    # load normal and adv data
     train_data = torch.load("./src/APE_GAN/data.tar")
     x_tmp = train_data["normal"][:5]
     input_adv_tmp = train_data["adv"][:5]
@@ -61,7 +61,7 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
     # loss functions
     loss_bce = nn.BCELoss()
     loss_mse = nn.MSELoss()
-
+    # train model and save weights
     print_str = "\t".join(["{}"] + ["{:.6f}"] * 2)
     print("\t".join(["{:}"] * 3).format("Epoch", "Gen_Loss", "Dis_Loss"))
     for epoch in range(epochs):
@@ -75,7 +75,8 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
             input, input_adv = data
             current_size = input.size(0)
             input, input_adv = Variable(input.to(device)), Variable(input_adv.to(device))
-            # Train D
+            
+            # Train Discriminator
             label_real = Variable(torch.ones(current_size).to(device))
             label_fake = Variable(torch.zeros(current_size).to(device))
 
@@ -107,6 +108,7 @@ def APEGAN_Train(input_channel, epochs, apegan_path):
         input_fake = G(Variable(input_adv_tmp.to(device))).data
         show_images(epoch, x_tmp, input_adv_tmp, input_fake, "./src/APE_GAN/Images/")
         G.train()
+    
     torch.save({"generator": G.state_dict(), "discriminator": D.state_dict()}, apegan_path)
 
     
