@@ -10,7 +10,7 @@ import torch.nn.functional as F
 
 class BasicBlock(nn.Module):
     expansion = 1
-
+    # Structure of the residual block
     def __init__(self, in_planes, planes, stride=1):
         super(BasicBlock, self).__init__()
         self.conv1 = nn.Conv2d(
@@ -20,6 +20,7 @@ class BasicBlock(nn.Module):
                                stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
 
+        # Identity shortcut connection
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != self.expansion*planes:
             self.shortcut = nn.Sequential(
@@ -49,7 +50,8 @@ class ResNet(nn.Module):
         self.flatten = nn.Flatten(1,-1)
         
         self.linear = nn.Linear(64, num_classes)
-
+    
+    # downsampling of the input
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
         layers = []
@@ -69,6 +71,7 @@ class ResNet(nn.Module):
 
         return out
 
+# weight initialize 
 def weights_init_uniform(m):
     classname = m.__class__.__name__
     if classname.find('Linear') != -1:
