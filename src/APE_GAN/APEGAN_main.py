@@ -38,7 +38,7 @@ def main(train, train_loader, test_loader, device, resnet_path, apegan_path, res
                 F2D.test_attack(test_loader, device, model, attack[i], resnet_path, apegan_path, input_channel, j)
 #Run main for MNIST
 print("Load data for MNIST and train model if no trained data is available (first run)")
-main(True, dataloader.train_dataloader , dataloader.test_dataloader, device.device, "./utils/resnet_model_MNIST.tar", "./utils/apegan_model_MNIST.tar", 100, 2, 0.15)
+main(True, dataloader.train_dataloader , dataloader.test_dataloader, device.device, "./utils/resnet_model_MNIST.tar", "./utils/apegan_model_MNIST.tar", 1, 2, 0.15)
 #Run main for CIFAR-10
 print("Load data for CIFAR-10 and train model if no trained data is available (first run)")
-main(True, dataloader.train_dataloader_CIFAR10 , dataloader.test_dataloader_CIFAR10, device.device, "./utils/resnet_model_CIFAR10.tar", "./utils/apegan_model_CIFAR10.tar", 100, 30, 0.15)
+main(True, dataloader.train_dataloader_CIFAR10 , dataloader.test_dataloader_CIFAR10, device.device, "./utils/resnet_model_CIFAR10.tar", "./utils/apegan_model_CIFAR10.tar", 1, 30, 0.15)
