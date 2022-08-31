@@ -1,4 +1,4 @@
-"""File for params"""
+"""File for params for ARGAN/Few2Decide"""
 
 ###################################
 ############## MNIST ##############
@@ -27,12 +27,4 @@ TRAIN_SPLIT = (1-(TEST_SPLIT+VALID_SPLIT))
 
 SPLIT_AUFTEILUNG = {TRAIN_SPLIT, VALID_SPLIT, TEST_SPLIT}
 
-# optimizer
-
-
-###################################
-############## CIFAR ##############
-###################################
-
-
-              
+#Its recommended to further use CIFAR 10 Normalizations

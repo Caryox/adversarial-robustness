@@ -7,13 +7,13 @@ def bit_reduction(img_data,dataset_name,clip_min=0.499999,clip_max=0.5,bit=4):
 	Usage: reduced_batch = bit_reduction(original_batch)
   '''
  
-  img_data_bit = torch.clone(img_data)
+  img_data_bit = torch.clone(img_data) #Clone tensor to protect original
  
   img_min = min(np.ravel(img_data_bit))
   img_max = max(np.ravel(img_data_bit))
-
+  #Calculate step size to reduce bits and maintain original normalization
   if  "CIFAR" in str(dataset_name):
-    step_size = abs(img_min-img_max)/(pow(2,bit)-1)
+    step_size = abs(img_min-img_max)/(pow(2,bit)-1) 
     steps = pow(2,bit)
 
     reduced_data = (img_data_bit-min(np.ravel(img_data_bit))) / (max(np.ravel(img_data_bit)) - min(np.ravel(img_data_bit)))
@@ -22,11 +22,11 @@ def bit_reduction(img_data,dataset_name,clip_min=0.499999,clip_max=0.5,bit=4):
     for i in range(img_data_bit.shape[0]):
       for j in range(img_data_bit.shape[1]): #RGB Values
         for k in range(steps):
-          reduced_data[i][j][(reduced_data[i][j]>=(step_size_norm*(k))) & (reduced_data[i][j]<=step_size_norm*(k+1))] = img_min+(k*step_size)
+          reduced_data[i][j][(reduced_data[i][j]>=(step_size_norm*(k))) & (reduced_data[i][j]<=step_size_norm*(k+1))] = img_min+(k*step_size) #Reduce CIFAR-10 color bits
   else:
-    reduced_data = (img_data_bit-min(np.ravel(img_data_bit))) / (max(np.ravel(img_data_bit)) - min(np.ravel(img_data_bit)))
+    reduced_data = (img_data_bit-min(np.ravel(img_data_bit))) / (max(np.ravel(img_data_bit)) - min(np.ravel(img_data_bit))) #Reduce MNIST color bits
     reduced_data = reduced_data.clip(min=clip_min,max=clip_max)
-
+    #If single Imgae is provided
     if (img_data_bit.shape.__len__() > 2):
       for i in range(img_data_bit.shape[0]):
         reduced_data[i][0][reduced_data[i][0]<clip_max] = torch.from_numpy(np.array(img_min))

@@ -1,4 +1,5 @@
 def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=False,attack=None,epsilon=None,t=[0.0],median_kernel=2) -> float:
+    #Import libraries
     import foolbox as fb
     from test_ensemble import test
     from torch.autograd import Variable
@@ -8,7 +9,8 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
     import torch
     import torch.nn.functional as F
     import numpy as np
-
+    
+    #Define variables
     train_losses = []
     runs=0
     train_counter = []
@@ -32,6 +34,8 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
     baseline_threshold = 0
     false_positives = 0
     true_negatives = 0
+    
+    #Set bit reduction for dataset
     if (dataset_name == "CIFAR"):
         color_depth=4
     else:
@@ -41,9 +45,9 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
         model = network.eval()
         time.sleep(1)
         if  "MNIST" in str(loader.dataset):
-            fmodel = fb.PyTorchModel(model, bounds=(-0.4242129623889923, 2.821486711502075), device="cpu")
+            fmodel = fb.PyTorchModel(model, bounds=(-0.4242129623889923, 2.821486711502075), device="cpu") #Boundings
         else:
-            fmodel = fb.PyTorchModel(model, bounds=(-1.989473819732666, 2.130864143371582), device="cpu")
+            fmodel = fb.PyTorchModel(model, bounds=(-1.989473819732666, 2.130864143371582), device="cpu") #Boundings
     
     for i, data in enumerate(loader,0):
         input, target = data
@@ -103,9 +107,7 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
 
 
                 distance_list=[max(difference_br).item(),max(difference_ms).item()]
-                #difference_total = statistics.fmean(distance_list)
                 difference_total = max(distance_list)
-                #print("Max Tensor Distance:", difference_total)
                 differences.append(difference_total)
                 if (is_attack):
                     if ((difference_total > t) and ((is_adv[0].numpy().astype(int))[x] == 1)):
@@ -114,7 +116,7 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
                 if(target[x].item()==jury_vote[x]):
                     correct_ensemble += 1
                 else:
-                    #print("Original target:",target[x].item(),"| Jury voted class:",jury_vote[x],"| Vanilla Ensemble Vote:" ,first_vote,"Median-Smoothed Ensemble Vote:",second_vote,"Bit-Reduced Ensemble Vote:",third_vote)
+                    #If debug is set, print misclassified input images for all three ensemble CNN models (to check if the squeezers worked)
                     if (debug_output):
                         fig = plt.figure()
                         ax1 = fig.add_subplot(131)  # left side
@@ -133,7 +135,7 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
                         fig.set_figwidth(10)
                         plt.show()
 
-
+            #Get correct predictions for all methods
             correct += pred.eq(target.data.view_as(pred)).sum()
             correct_ms += pred_ms.eq(target.data.view_as(pred_ms)).sum()
             correct_br += pred_br.eq(target.data.view_as(pred_br)).sum()
@@ -150,13 +152,12 @@ def evaluate_attack(loader,network,dataset_name,base_accuracy,device,is_attack=F
     acc = 100. * correct / len(loader.dataset)
     test_acc.append(acc)
     
-    print('\nTest set: Avg. loss baseline: {:.4f}, Accuracy: {}/{} ({:.0f}%), Accuracy_Median_Smooth: {}, Accuracy_Bit_Reduction: {}, Accuracy_Jury_Ensemble: {}, Accuracy_Pooled_Ensemble: {}\n'.format(
+    print('\nTest set: Avg. loss baseline: {:.4f},\nAccuracy: {}/{} ({:.0f}%),\nAccuracy_Median_Smooth: {},\nAccuracy_Bit_Reduction: {},\nAccuracy_Jury_Ensemble: {},\nAccuracy_Pooled_Ensemble: {}\n'.format(
     test_loss, acc, len(loader.dataset),
     100. * correct / len(loader.dataset), 100. * correct_ms / len(loader.dataset), 100. * correct_br / len(loader.dataset), 100. * correct_ensemble / len(loader.dataset),100. * correct_pool / len(loader.dataset)))
-    print('Attack Success (Pooled): {}'.format((100-(100/base_accuracy)-acc)/100))
-
-    print('L0 Distance: {}'.format(distance_l0/runs))
-    print('L2 Distance: {}'.format(distance_l2/runs))
-    print('Linf Distance: {}'.format(distance_linf/runs))
-    #return(differences,np.array(adversarial_map).flatten())
+    if(is_attack):
+        print('Attack Success (Pooled): {}'.format((100-(100/base_accuracy)-acc)/100))
+        print('L0 Distance: {}'.format(distance_l0/runs))
+        print('L2 Distance: {}'.format(distance_l2/runs))
+        print('Linf Distance: {}'.format(distance_linf/runs))
     
