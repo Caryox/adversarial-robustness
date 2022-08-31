@@ -27,5 +27,5 @@ def main(train, train_loader, test_loader, device, resnet_path, apegan_path, res
             for j in [0.1, 0.2, 0.3, 0.4, 0.5, 1.0]:
                 F2D.test_attack(test_loader, device, model, attack[i], resnet_path, apegan_path, input_channel, j)
     
-main(False, dataloader.train_dataloader , dataloader.test_dataloader, device.device, "./utils/resnet_model_10_MNIST.tar", "./utils/apegan_model_10_MNIST.tar", 100, 2, 0.15)
-main(False, dataloader.train_dataloader_CIFAR10 , dataloader.test_dataloader_CIFAR10, device.device, "./utils/resnet_model_100_0_15_CIFAR10.tar", "./utils/apegan_model_100_0_15_CIFAR10.tar", 100, 30, 0.15)
+main(True, dataloader.train_dataloader , dataloader.test_dataloader, device.device, "./utils/resnet_model_MNIST.tar", "./utils/apegan_model_MNIST.tar", 100, 2, 0.15)
+main(True, dataloader.train_dataloader_CIFAR10 , dataloader.test_dataloader_CIFAR10, device.device, "./utils/resnet_model_CIFAR10.tar", "./utils/apegan_model_CIFAR10.tar", 100, 30, 0.15)
