@@ -1,4 +1,4 @@
-# Nutzen der GPU wenn vorhanden, ansonsten CPU
+# Use of GPU if available, otherwise CPU
 import torch as torch
 
 
