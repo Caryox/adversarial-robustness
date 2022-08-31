@@ -1,4 +1,4 @@
-def evaluate_adversarial_detection(dataset,labelset,network,dataset_name,t=0.01,evaluate=False):
+def evaluate_adversarial_detection(dataset,labelset,network,dataset_name,t=0.01,evaluate=False) -> float:
     #Import custom functions
     from img_median_smoothing import median_smoothing
     from img_bit_reduction import bit_reduction
