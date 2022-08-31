@@ -29,6 +29,14 @@ Image classification is applied in many applications nowadays; thus, its algorit
 - [DeepFool: a simple and accurate method to fool deep neural networks](http://arxiv.org/abs/1511.04599) 
 - Carline and Wagner's attacks[Towards Evaluating the Robustness of Neural Networks](http://arxiv.org/abs/1608.04644)
 
+### Requirements Installation
+The requirement.txt file lists all the needed packages to launch our codes. To setup your environment, run :
+
+```
+pip install -r requirements.txt
+```
+ 
+####  
 ### Example Images
 Conventional Image Rectification Framework using Ensemble CNN
 ![Ensemble](https://github.com/Caryox/adversial-robustness/blob/fc70b735438bafb5d275c1ca33cc52e5209739bc/data/Ensemble%20Conventional%20Rectification%20V4_Updated.jpg)
