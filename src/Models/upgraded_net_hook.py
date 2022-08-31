@@ -1,3 +1,7 @@
+'''
+ResNet and hook for weight-matrix and avg-pool (Few2Decide)
+'''
+
 from pyexpat import model
 from re import X
 import torch
@@ -70,17 +74,27 @@ def weights_init_uniform(m):
     if classname.find('Linear') != -1:
         m.weight.data.uniform_(0.0, 1.0)
 
+# ResNet-20 
+'''
 def ResNet20(input_channel):
     return ResNet(input_channel, BasicBlock, [3, 3, 3])
-
+'''
+# ResNet-32
+'''
 def ResNet32(input_channel):
     return ResNet(input_channel, BasicBlock, [5, 5, 5])
-
+'''
+# ResNet-44
 def ResNet44(input_channel):
     return ResNet(input_channel, BasicBlock, [7, 7, 7])
 
+# ResNet-56
+'''
 def ResNet56(input_channel):
     return ResNet(input_channel, BasicBlock, [9, 9, 9])
+'''
+
+# hook (required for Few2Decide)
 
 activation = {} #this will store values from fc2 layer, which would be then used as input for the few2decide
 def get_activation(name):

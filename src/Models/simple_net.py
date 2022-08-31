@@ -1,3 +1,5 @@
+# Simple CNN for Ensemble Model
+
 import torch
 import torch.nn as nn
 class simple_net(nn.Module):
