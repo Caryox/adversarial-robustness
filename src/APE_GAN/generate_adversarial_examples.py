@@ -37,5 +37,6 @@ def gen_adv(trainloader, device, model, resnet_path, eps, input_channel):
         else:
             normal_data = torch.cat((normal_data, input))
             adv_data = torch.cat((adv_data, raw_adv_input))
-
+    
+    # save normal and adv data for APEGAN
     torch.save({"normal": normal_data, "adv": adv_data}, "./src/APE_GAN/data.tar")
