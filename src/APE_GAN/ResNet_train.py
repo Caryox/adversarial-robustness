@@ -16,7 +16,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 from torch.autograd import Variable
 from tqdm import tqdm
 
-
+#Define resnet and set hyperparameters
 def resnet_train(trainloader, device, model, resnet_path, epochs):
     lr = 0.01
     momentum = 0.9
@@ -24,11 +24,12 @@ def resnet_train(trainloader, device, model, resnet_path, epochs):
     milestones= [50,75]
     gamma = 0.1
     model = model
-    model.apply(upgraded_net_hook.weights_init_uniform)
-    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay)
+    model.apply(upgraded_net_hook.weights_init_uniform) #Use uniform initialization
+    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=w_decay) #Use SGD with weight_decay
     learningrate_scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=gamma) # calc new learning rate
     loss_func = nn.CrossEntropyLoss().to(device)
     
+    #Train model and save weights
     print("Training model for adversarial examples...")
     for epoch in range(epochs):
         print("Epoch: ", epoch + 1)

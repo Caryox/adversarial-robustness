@@ -1,3 +1,4 @@
+#Import libraries inside function if code is extended somewhere later
 def test(network,test_loader,use_ensemble=0):
   import torch.nn.functional as F
   import torch
@@ -6,12 +7,14 @@ def test(network,test_loader,use_ensemble=0):
   network.eval()
   test_loss = 0
   correct = 0
-  with torch.no_grad():
+  with torch.no_grad(): #Deactivate gradients
     for data, target in test_loader:
       output = network(data)
       test_loss += F.cross_entropy(output, target).item()
       pred = output.data.max(1, keepdim=True)[1]
       correct += pred.eq(target.data.view_as(pred)).sum()
+
+  #Not needed but can be used for deeper analysis
   test_loss /= len(test_loader.dataset)
   test_losses.append(test_loss)
   acc = 100. * correct / len(test_loader.dataset)
