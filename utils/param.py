@@ -1,8 +1,6 @@
 """File for params for ARGAN/Few2Decide"""
 
-###################################
-############## MNIST ##############
-###################################
+# Params for MNIST
 
 num_epochs = 20
 BATCH_SIZE = 32
